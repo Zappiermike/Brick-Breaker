@@ -11,24 +11,25 @@ import javax.swing.JLabel;
 
 public class BrickBreaker extends JFrame implements KeyListener {
 
-    JLabel label;
+    JLabel sliderLabel;
+    JLabel background;
     ImageIcon icon;
 
     public BrickBreaker() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(550, 600);
+        this.setSize(500, 600);
         this.setLayout(null);
         this.setVisible(true);
         this.addKeyListener(this);
-        label = new JLabel();
-        label.setBounds(225, 500, 100, 100);
-        // label.setBackground(Color.red);
-        label.setOpaque(true);
-        this.add(label);
+
+        sliderLabel = new JLabel();
+        sliderLabel.setBounds(200, 500, 100, 100);
+        sliderLabel.setOpaque(true);
+        this.add(sliderLabel);
 
         URL url = BrickBreaker.class.getResource("blueslider.png");
         icon = new ImageIcon(url);
-        label.setIcon(icon);
+        sliderLabel.setIcon(icon);
 
     }
     // public static void DisplayFrame() {
@@ -61,12 +62,30 @@ public class BrickBreaker extends JFrame implements KeyListener {
                 break;
             case KeyEvent.VK_LEFT:
                 System.out.println("You Pressed Left!");
-                label.setLocation(label.getX() - speed, label.getY());
+                if (sliderLabel.getX() - speed >= 0) {
+                    sliderLabel.setLocation(sliderLabel.getX() - speed, sliderLabel.getY());
+                }
+                System.out.println("labelx: " + sliderLabel.getX() + " thisx: " + this.getX());
                 break;
             case KeyEvent.VK_RIGHT:
                 System.out.println("You Pressed Right!");
-                label.setLocation(label.getX() + speed, label.getY());
+                if (sliderLabel.getX() + 100 < this.getSize().getWidth()) {
+                    sliderLabel.setLocation(sliderLabel.getX() + speed, sliderLabel.getY());
+                }
+                System.out.println("labelx: " + sliderLabel.getX() + " thisx: " + this.getSize().getWidth());
                 break;
         }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        // TODO Auto-generated method stub
+        System.out.println();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // TODO Auto-generated method stub
+        System.out.println();
     }
 }
