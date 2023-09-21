@@ -11,15 +11,20 @@ import javax.swing.Timer;
 
 public class Ball extends JComponent {
 
-    // Class variables
-    int x, y, bounds = 80;
+    // Global variables.
+    int x, y = 380;
+    int ballDiameter = 10;
+    int frameBoundX, frameBoundY;
     boolean move_up, move_left;
 
-    // Constructor
-    public Ball() {
+    public Ball(int xb, int yb) {
+        this.frameBoundX = xb;
+        this.frameBoundY = yb;
+
+        // The timer is used to repaint the component.
         Timer timer = new Timer(10, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (x > getWidth() - bounds) {
+                if (x > getWidth() - ballDiameter) {
                     move_left = true;
                 }
 
@@ -33,7 +38,7 @@ public class Ball extends JComponent {
                     x += 1;
                 }
 
-                if (y > getHeight() - bounds) {
+                if (y > getHeight() - ballDiameter) {
                     move_up = true;
                 }
 
@@ -46,8 +51,8 @@ public class Ball extends JComponent {
                 } else {
                     y += 1;
                 }
-                
-                System.out.println("Ball is now at " + x + "," + y);
+
+                // System.out.println("Ball is now at " + x + "," + y);
                 repaint();
             }
         });
@@ -60,7 +65,7 @@ public class Ball extends JComponent {
         super.paintComponent(g2d);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.red);
-        g2d.fillOval(x, y, bounds, bounds);
+        g2d.fillOval(x, y, ballDiameter, ballDiameter);
         g2d.dispose();
 
         Toolkit.getDefaultToolkit().sync();
