@@ -9,10 +9,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import javafx.scene.text.Font;
+
 public class BrickBreaker extends JFrame implements KeyListener {
 
     JLabel sliderLabel;
-    JLabel background;
+    JLabel backgroundLabel;
     ImageIcon icon;
 
     public BrickBreaker() {
@@ -22,14 +24,19 @@ public class BrickBreaker extends JFrame implements KeyListener {
         this.setVisible(true);
         this.addKeyListener(this);
 
+        URL backgroundUrl = BrickBreaker.class.getResource("bb_background.jpg");
+        ImageIcon backgroundIcon = new ImageIcon(backgroundUrl);
+        backgroundLabel = new JLabel(backgroundIcon);
+        backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(), backgroundIcon.getIconHeight());
+        
         sliderLabel = new JLabel();
-        sliderLabel.setBounds(200, 500, 100, 100);
+        sliderLabel.setBounds(200, 500, 100, 30);
         sliderLabel.setOpaque(true);
-        this.add(sliderLabel);
-
         URL url = BrickBreaker.class.getResource("blueslider.png");
         icon = new ImageIcon(url);
         sliderLabel.setIcon(icon);
+        this.add(sliderLabel);
+        this.add(backgroundLabel);
 
     }
     // public static void DisplayFrame() {
