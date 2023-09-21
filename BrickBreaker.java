@@ -16,9 +16,9 @@ public class BrickBreaker extends JFrame implements KeyListener {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 600);
         this.setLayout(null);
-        this.setVisible(true);
         this.addKeyListener(this);
-
+        this.setLocationRelativeTo(null);
+        
         URL backgroundUrl = BrickBreaker.class.getResource("bb_background.jpg");
         ImageIcon backgroundIcon = new ImageIcon(backgroundUrl);
         backgroundLabel = new JLabel(backgroundIcon);
@@ -30,8 +30,10 @@ public class BrickBreaker extends JFrame implements KeyListener {
         URL url = BrickBreaker.class.getResource("blueslider.png");
         icon = new ImageIcon(url);
         sliderLabel.setIcon(icon);
-        this.add(sliderLabel);
-        this.add(backgroundLabel);
+        this.add(new Ball());
+        // this.add(sliderLabel);
+        // this.add(backgroundLabel);
+        this.setVisible(true);
 
     }
 
