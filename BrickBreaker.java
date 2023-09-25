@@ -1,79 +1,67 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
+import javafx.scene.layout.Border;
 
-public class BrickBreaker extends JFrame implements KeyListener {
+public class BrickBreaker extends JFrame {
 
-    JLabel sliderLabel;
+    int frameBoundX = 500;
+    int frameBoundY = 600;
+    // JLabel sliderLabel;
     JLabel backgroundLabel;
-    ImageIcon icon;
 
     public BrickBreaker() {
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(500, 600);
-        this.setLayout(null);
-        this.addKeyListener(this);
-        this.setLocationRelativeTo(null);
-        
-        URL backgroundUrl = BrickBreaker.class.getResource("bb_background.jpg");
-        ImageIcon backgroundIcon = new ImageIcon(backgroundUrl);
-        backgroundLabel = new JLabel(backgroundIcon);
-        backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(), backgroundIcon.getIconHeight());
-        
-        sliderLabel = new JLabel();
-        sliderLabel.setBounds(200, 500, 100, 30);
-        sliderLabel.setOpaque(true);
-        URL url = BrickBreaker.class.getResource("blueslider.png");
-        icon = new ImageIcon(url);
-        sliderLabel.setIcon(icon);
-        this.add(new Ball());
-        // this.add(sliderLabel);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(500, 600);
+        setLocationRelativeTo(null);
+        setResizable(false);
+
+        // Add new panel
+        JPanel panel = new JPanel(new BorderLayout());
+        setContentPane(panel);
+
+        // Add slider
+        Slider slider = new Slider(200, 500, 100, 30);
+        panel.add(slider);
+        setVisible(true);
+
+        // JPanel panel = new JPanel();
+        // panel.setLayout(null);
+        // setContentPane(panel);
+
+        // URL backgroundUrl = BrickBreaker.class.getResource("bb_background.jpg");
+        // ImageIcon backgroundIcon = new ImageIcon(backgroundUrl);
+        // backgroundLabel = new JLabel(backgroundIcon);
+        // backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(),
+        // backgroundIcon.getIconHeight());
+
+        // Slider slider = new Slider();
+        // panel.add(slider);
+        // panel.add(backgroundLabel);
+
+        // this.add(new Slider());
+
+        // URL sliderUrl = BrickBreaker.class.getResource("blueslider.png");
+        // ImageIcon sliderIcon = new ImageIcon(sliderUrl);
+        // sliderLabel = new JLabel();
+        // sliderLabel.setBounds(200, 500, 100, 30);
+        // sliderLabel.setOpaque(true);
+        // sliderLabel.setIcon(sliderIcon);
+
         // this.add(backgroundLabel);
-        this.setVisible(true);
+        // this.add(sliderLabel);
+        // this.add(new Slider());
+        // this.add(new Ball(frameBoundX, frameBoundY));
+        // this.setVisible(true);
 
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        int keyCode = e.getKeyCode();
-        int speed = 20;
-        switch (keyCode) {
-            case KeyEvent.VK_UP:
-                System.out.println("You Pressed Up!");
-                break;
-            case KeyEvent.VK_DOWN:
-                System.out.println("You Pressed Down!");
-                break;
-            case KeyEvent.VK_LEFT:
-                System.out.println("You Pressed Left!");
-                if (sliderLabel.getX() - speed >= 0) {
-                    sliderLabel.setLocation(sliderLabel.getX() - speed, sliderLabel.getY());
-                }
-                System.out.println("labelx: " + sliderLabel.getX() + " thisx: " + this.getX());
-                break;
-            case KeyEvent.VK_RIGHT:
-                System.out.println("You Pressed Right!");
-                if (sliderLabel.getX() + 100 < this.getSize().getWidth()) {
-                    sliderLabel.setLocation(sliderLabel.getX() + speed, sliderLabel.getY());
-                }
-                System.out.println("labelx: " + sliderLabel.getX() + " thisx: " + this.getSize().getWidth());
-                break;
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println();
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println();
-    }
 }
