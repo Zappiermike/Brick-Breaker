@@ -57,7 +57,7 @@ public class Ball extends JComponent {
                 }
 
 
-                // System.out.println("Ball is now at " + x + "," + y);
+                System.out.println("Ball is now at " + x + "," + y);
                 repaint();
             }
         });
