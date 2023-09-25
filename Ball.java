@@ -14,7 +14,7 @@ public class Ball extends JComponent {
     // Global variables.
     int x = 240;    // Starting x coordinate
     int y = 480;    // Starting y coordinate
-    int ballDiameter = 20;
+    final int ballDiameter = 20;
     int frameBoundX, frameBoundY;
     boolean move_up = true;
     boolean move_left;
@@ -26,18 +26,27 @@ public class Ball extends JComponent {
         this.game = game;
 
         // The timer is used to repaint the component.
-        Timer timer = new Timer(10, new ActionListener() {
+        Timer timer = new Timer(3, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
                 if (collision()){
+                    // System.out.println("COLLISION");
                     System.out.println(String.format("Ball's coordinates: %d, %d\n"
                                                    + "Slider's coordinates %d, %d\n",
                                                    getBounds().x, getBounds().y,
                                                    game.slider.getBounds().x,
                                                    game.slider.getBounds().y
                     ));
-                    // System.out.println("COLLISION");
-                    move_up = !move_up;
+
+                    if (x < game.slider.getBounds().x && y + (ballDiameter/2) <= game.slider.getBounds().y + game.slider.getBounds().height){
+                        System.out.println("Go Left");
+                        move_left = true;
+                    } else if (x >= (game.slider.getBounds().x + game.slider.getBounds().width - 1) && y + (ballDiameter/2) <= game.slider.getBounds().y + game.slider.getBounds().height){
+                        System.out.println("Go Right");
+                        move_left = false;
+                    } else {
+                        System.out.println("Flip vertical direction");
+                        move_up = !move_up;
+                    }
                 }
 
                 // Vertical handling
@@ -69,9 +78,6 @@ public class Ball extends JComponent {
                 } else {
                     x += 1;
                 }
-
-
-                // System.out.println("Ball is now at " + x + "," + y);
                 repaint();
             }
         });
@@ -89,12 +95,19 @@ public class Ball extends JComponent {
         Toolkit.getDefaultToolkit().sync();
     }
 
+    // public int getX(){
+    //     return x;
+    // }
+
+    // public int getY(){
+    //     return y;
+    // }
+
     public Rectangle getBounds() {
 		return new Rectangle(x, y, ballDiameter, ballDiameter);
 	}
 
     private boolean collision() {
-
         return game.slider.getBounds().intersects(getBounds());
 	}
 
