@@ -33,15 +33,13 @@ public class BrickBreaker extends JFrame {
         panel.add(slider);
         setVisible(true);
 
-        // JPanel panel = new JPanel();
-        // panel.setLayout(null);
-        // setContentPane(panel);
-
-        // URL backgroundUrl = BrickBreaker.class.getResource("bb_background.jpg");
-        // ImageIcon backgroundIcon = new ImageIcon(backgroundUrl);
-        // backgroundLabel = new JLabel(backgroundIcon);
-        // backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(),
-        // backgroundIcon.getIconHeight());
+        // Add background
+        URL backgroundUrl = BrickBreaker.class.getResource("background.jpg");
+        ImageIcon backgroundIcon = new ImageIcon(backgroundUrl);
+        backgroundLabel = new JLabel(backgroundIcon);
+        backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(),
+        backgroundIcon.getIconHeight());
+        panel.add(backgroundLabel);
 
         // Slider slider = new Slider();
         // panel.add(slider);
