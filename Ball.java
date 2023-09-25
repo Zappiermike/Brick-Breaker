@@ -12,10 +12,12 @@ import javax.swing.Timer;
 public class Ball extends JComponent {
 
     // Global variables.
-    int x, y = 380;
-    int ballDiameter = 10;
+    int x = 240;    // Starting x coordinate
+    int y = 480;    // Starting y coordinate
+    int ballDiameter = 20;
     int frameBoundX, frameBoundY;
-    boolean move_up, move_left;
+    boolean move_up = true;
+    boolean move_left;
 
     public Ball(int xb, int yb) {
         this.frameBoundX = xb;
@@ -24,6 +26,22 @@ public class Ball extends JComponent {
         // The timer is used to repaint the component.
         Timer timer = new Timer(10, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                // Vertical handling
+                if (y > getHeight() - ballDiameter) {
+                    move_up = true;
+                }
+
+                if (y < 0) {
+                    move_up = false;
+                }
+
+                if (move_up) {
+                    y -= 1;
+                } else {
+                    y += 1;
+                }
+
+                // Horizontal  
                 if (x > getWidth() - ballDiameter) {
                     move_left = true;
                 }
@@ -38,19 +56,6 @@ public class Ball extends JComponent {
                     x += 1;
                 }
 
-                if (y > getHeight() - ballDiameter) {
-                    move_up = true;
-                }
-
-                if (y < 0) {
-                    move_up = false;
-                }
-
-                if (move_up) {
-                    y -= 1;
-                } else {
-                    y += 1;
-                }
 
                 // System.out.println("Ball is now at " + x + "," + y);
                 repaint();
