@@ -17,20 +17,26 @@ public class BrickBreaker extends JFrame {
     int frameBoundY = 600;
     // JLabel sliderLabel;
     JLabel backgroundLabel;
+    Ball ball;
 
     public BrickBreaker() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(500, 600);
         setLocationRelativeTo(null);
         setResizable(false);
-
+        
         // Add new panel
         JPanel panel = new JPanel(new BorderLayout());
         setContentPane(panel);
-
+        
         // Add slider
         Slider slider = new Slider(200, 500, 100, 30);
         panel.add(slider);
+        setVisible(true);
+        
+        // Add ball
+        ball = new Ball(frameBoundX, frameBoundY);
+        panel.add(ball);
         setVisible(true);
 
         // Add background
@@ -40,26 +46,9 @@ public class BrickBreaker extends JFrame {
         backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(),
         backgroundIcon.getIconHeight());
         panel.add(backgroundLabel);
-
-        // Slider slider = new Slider();
-        // panel.add(slider);
-        // panel.add(backgroundLabel);
-
-        // this.add(new Slider());
-
-        // URL sliderUrl = BrickBreaker.class.getResource("blueslider.png");
-        // ImageIcon sliderIcon = new ImageIcon(sliderUrl);
-        // sliderLabel = new JLabel();
-        // sliderLabel.setBounds(200, 500, 100, 30);
-        // sliderLabel.setOpaque(true);
-        // sliderLabel.setIcon(sliderIcon);
-
-        // this.add(backgroundLabel);
-        // this.add(sliderLabel);
-        // this.add(new Slider());
-        // this.add(new Ball(frameBoundX, frameBoundY));
-        // this.setVisible(true);
-
+        setVisible(true);
+        
+        
     }
 
 }
