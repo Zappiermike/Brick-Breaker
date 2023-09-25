@@ -3,15 +3,18 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JComponent;
+import java.awt.Rectangle;
 
 public class Slider extends JComponent implements KeyListener {
 
     private int x;
-    private int y;
+    private final int y;
     private int width;
     private int height;
+    private BrickBreaker game;
 
-    public Slider(int x, int y, int width, int height) {
+    public Slider(BrickBreaker game, int x, int y, int width, int height) {
+        this.game = game;
         this.x = x;
         this.y = y;
         this.width = width;
@@ -47,6 +50,10 @@ public class Slider extends JComponent implements KeyListener {
                 break;
         }
     }
+
+    public Rectangle getBounds() {
+		return new Rectangle(x, y, width, height);
+	}
 
     @Override
     public void keyReleased(KeyEvent e) {
