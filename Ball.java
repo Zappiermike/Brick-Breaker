@@ -12,12 +12,12 @@ import java.awt.Rectangle;
 public class Ball extends JComponent {
 
     // Global variables.
-    int x = 240;    // Starting x coordinate
-    int y = 480;    // Starting y coordinate
+    int x = 186; // Starting x coordinate
+    int y = 480; // Starting y coordinate
     final int ballDiameter = 20;
     int frameBoundX, frameBoundY;
-    boolean move_up = true;
-    boolean move_left;
+    boolean move_up = false;
+    boolean move_left = false;
     private BrickBreaker game;
 
     public Ball(BrickBreaker game, int xb, int yb) {
@@ -26,26 +26,31 @@ public class Ball extends JComponent {
         this.game = game;
 
         // The timer is used to repaint the component.
-        Timer timer = new Timer(3, new ActionListener() {
+        Timer timer = new Timer(2000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (collision()){
-                    // System.out.println("COLLISION");
+                if (collision()) {
                     System.out.println(String.format("Ball's coordinates: %d, %d\n"
-                                                   + "Slider's coordinates %d, %d\n",
-                                                   getBounds().x, getBounds().y,
-                                                   game.slider.getBounds().x,
-                                                   game.slider.getBounds().y
-                    ));
-
-                    if (x < game.slider.getBounds().x && y + (ballDiameter/2) <= game.slider.getBounds().y + game.slider.getBounds().height){
+                            + "Slider's coordinates %d, %d\n",
+                            getBounds().x, getBounds().y,
+                            game.slider.getBounds().x,
+                            game.slider.getBounds().y));
+                    System.out.println(String.format("x: %d, y: %d, sliderX: %d, sliderY: %d, balldiameter/1.5: %f", x, y, game.slider.getBounds().x, game.slider.getBounds().y, (ballDiameter/1.5)));
+                    // Vertical now working
+                    if (y + ballDiameter <= game.slider.getBounds().y + 1 && //
+                            x + (ballDiameter/1.5) >= game.slider.getBounds().x &&
+                            x + (ballDiameter - ballDiameter/1.5) <= game.slider.getBounds().x + game.slider.getBounds().width) {
+                        System.out.println("Move up!");
+                        move_up = true;
+                    }
+                    else if (x <= game.slider.getBounds().x && 
+                        y + (ballDiameter / 2) <= game.slider.getBounds().y + game.slider.getBounds().height) {
                         System.out.println("Go Left");
                         move_left = true;
-                    } else if (x >= (game.slider.getBounds().x + game.slider.getBounds().width - 1) && y + (ballDiameter/2) <= game.slider.getBounds().y + game.slider.getBounds().height){
+                    } 
+                    else if (x >= (game.slider.getBounds().x + game.slider.getBounds().width - 1)
+                            && y + (ballDiameter / 2) <= game.slider.getBounds().y + game.slider.getBounds().height) {
                         System.out.println("Go Right");
                         move_left = false;
-                    } else {
-                        System.out.println("Flip vertical direction");
-                        move_up = !move_up;
                     }
                 }
 
@@ -64,7 +69,7 @@ public class Ball extends JComponent {
                     y += 1;
                 }
 
-                // Horizontal  
+                // Horizontal
                 if (x > getWidth() - ballDiameter) {
                     move_left = true;
                 }
@@ -96,19 +101,19 @@ public class Ball extends JComponent {
     }
 
     // public int getX(){
-    //     return x;
+    // return x;
     // }
 
     // public int getY(){
-    //     return y;
+    // return y;
     // }
 
     public Rectangle getBounds() {
-		return new Rectangle(x, y, ballDiameter, ballDiameter);
-	}
+        return new Rectangle(x, y, ballDiameter, ballDiameter);
+    }
 
     private boolean collision() {
         return game.slider.getBounds().intersects(getBounds());
-	}
+    }
 
 }
