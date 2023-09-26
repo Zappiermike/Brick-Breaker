@@ -12,8 +12,8 @@ import java.awt.Rectangle;
 public class Ball extends JComponent {
 
     // Global variables.
-    int x = 186; // Starting x coordinate
-    int y = 480; // Starting y coordinate
+    int x = 179; // Starting x coordinate
+    int y = 522; // Starting y coordinate
     final int ballDiameter = 20;
     int frameBoundX, frameBoundY;
     boolean move_up = false;
@@ -43,7 +43,7 @@ public class Ball extends JComponent {
                         move_up = true;
                     }
                     else if (x <= game.slider.getBounds().x && 
-                        y + (ballDiameter / 2) <= game.slider.getBounds().y + game.slider.getBounds().height) {
+                             y + (ballDiameter - (ballDiameter / 1.5)) <= game.slider.getBounds().y + game.slider.getBounds().height) {
                         System.out.println("Go Left");
                         move_left = true;
                     } 
