@@ -58,31 +58,6 @@ public class Ball extends JComponent {
                         System.out.println("Go Right");
                         move_left = false;
                     }
-
-                    // System.out.println("\nMOVE UP Debug");
-                    // System.out.println(String.format("%d >= %d\n%d <= %d\n%d < %d",
-                    // x + ballDiameter, game.slider.getBounds().x,
-                    // x, game.slider.getBounds().x + game.slider.getBounds().width,
-                    // y + ballDiameter, game.slider.getBounds().y));
-
-                    // System.out.println("\nMOVE LEFT Debug");
-                    // System.out.println(String.format("%d <= %d\n%d > %d\n%d < %d",
-                    // x, game.slider.getBounds().x,
-                    // y, game.slider.getBounds().y - ballDiameter,
-                    // y, game.slider.getBounds().y + game.slider.getBounds().height));
-
-                    // System.out.println("\nMOVE RIGHT Debug");
-                    // System.out.println(String.format("%d >= %d\n%d > %d\n%d < %d",
-                    // x, game.slider.getBounds().x + game.slider.getBounds().width,
-                    // y, game.slider.getBounds().y - ballDiameter,
-                    // y, game.slider.getBounds().y + game.slider.getBounds().height));
-
-                    // System.out.println("\nMOVE DOWN Debug");
-                    // System.out.println(String.format("%d >= %d\n"
-                    // + "%d <= %d\n"
-                    // + "%d > %d", x + ballDiameter, game.slider.getBounds().x,
-                    // x, game.slider.getBounds().x + game.slider.getBounds().width,
-                    // y, game.slider.getBounds().y + game.slider.getBounds().height));
                 }
 
                 // Vertical handling
