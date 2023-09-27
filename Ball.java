@@ -12,7 +12,7 @@ import java.awt.Rectangle;
 public class Ball extends JComponent {
 
     // Global variables.
-    int x = 183; // Starting x coordinate
+    int x = (int) (Math.random() * 1000) % 500; // Starting x coordinate
     int y = 533; // Starting y coordinate
     final int ballDiameter = 20;
     int frameBoundX, frameBoundY;
@@ -26,7 +26,7 @@ public class Ball extends JComponent {
         this.game = game;
 
         // The timer is used to repaint the component.
-        Timer timer = new Timer(4, new ActionListener() {
+        Timer timer = new Timer(0, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (collision()) {
                     System.out.println(String.format("Ball's coordinates: %d, %d\n"
