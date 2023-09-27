@@ -26,7 +26,7 @@ public class Ball extends JComponent {
         this.game = game;
 
         // The timer is used to repaint the component.
-        Timer timer = new Timer(0, new ActionListener() {
+        Timer timer = new Timer(3, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (collision()) {
                     System.out.println(String.format("Ball's coordinates: %d, %d\n"
