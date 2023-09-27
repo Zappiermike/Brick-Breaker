@@ -12,13 +12,15 @@ import java.awt.Rectangle;
 public class Ball extends JComponent {
 
     // Global variables.
-    int x = (int) (Math.random() * 1000) % 500; // Starting x coordinate
-    int y = 533; // Starting y coordinate
+    // int x = (int) (Math.random() * 1000) % 500; // Starting x coordinate
+    int x = 200; // Starting x coordinate
+    int y = 220; // Starting y coordinate
     final int ballDiameter = 20;
     int frameBoundX, frameBoundY;
     boolean move_up = true;
-    boolean move_left = false;
+    boolean move_left = true;
     private BrickBreaker game;
+    private Timer timer;
 
     public Ball(BrickBreaker game, int xb, int yb) {
         this.frameBoundX = xb;
@@ -26,9 +28,9 @@ public class Ball extends JComponent {
         this.game = game;
 
         // The timer is used to repaint the component.
-        Timer timer = new Timer(3, new ActionListener() {
+        timer = new Timer(3, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (collision()) {
+                if (sliderCollision()) {
                     System.out.println(String.format("Ball's coordinates: %d, %d\n"
                             + "Slider's coordinates %d, %d\n",
                             getBounds().x, getBounds().y,
@@ -58,6 +60,11 @@ public class Ball extends JComponent {
                         System.out.println("Go Right");
                         move_left = false;
                     }
+                }
+                Brick hitBrick = brickCollision();
+                if (hitBrick != null) {
+                    System.out.println("COLLISION WITH BRICK");
+                    hitBrick.reduceHealth();
                 }
 
                 // Vertical handling
@@ -106,20 +113,20 @@ public class Ball extends JComponent {
         Toolkit.getDefaultToolkit().sync();
     }
 
-    // public int getX(){
-    // return x;
-    // }
-
-    // public int getY(){
-    // return y;
-    // }
-
     public Rectangle getBounds() {
         return new Rectangle(x, y, ballDiameter, ballDiameter);
     }
 
-    private boolean collision() {
+    private boolean sliderCollision() {
         return game.slider.getBounds().intersects(getBounds());
     }
 
+    private Brick brickCollision() {
+        for (Brick brick : game.brickList) {
+            if (brick.getBounds().intersects(getBounds())) {
+                return brick;
+            }
+        }
+        return null;
+    }
 }
