@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.net.URL;
 import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -14,6 +13,7 @@ public class BrickBreaker extends JFrame {
     JLabel backgroundLabel;
     Ball ball;
     Slider slider;
+    ArrayList<Brick> brickList = new ArrayList<Brick>();
 
     public BrickBreaker() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -35,6 +35,16 @@ public class BrickBreaker extends JFrame {
         panel.add(ball);
         setVisible(true);
 
+        generateBricks();
+        for (Brick brick : brickList) {
+            panel.add(brick);
+            setVisible(true);
+            ;
+        }
+        // Brick brick = new Brick(200, 250);
+        // panel.add(brick);
+        // setVisible(true);
+
         // Add background
         URL backgroundUrl = BrickBreaker.class.getResource("background.jpg");
         ImageIcon backgroundIcon = new ImageIcon(backgroundUrl);
@@ -45,6 +55,18 @@ public class BrickBreaker extends JFrame {
         setVisible(true);
 
         // Add bricks
+    }
+
+    public void generateBricks() {
+        // Unique starting and iterating numbers are due to the window size
+        // while also spacing out the bricks evenly
+        for (int row = 10; row <= 85; row += 35) {
+            for (int b = 5; b < frameBoundX; b += 99) {
+                System.out.println("Generating brick #" + b);
+                Brick brick = new Brick(b, row);
+                brickList.add(brick);
+            }
+        }
     }
 
 }
