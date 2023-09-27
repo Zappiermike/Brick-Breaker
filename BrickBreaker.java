@@ -1,5 +1,7 @@
 import java.awt.BorderLayout;
 import java.net.URL;
+import java.util.ArrayList;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,6 +33,30 @@ public class BrickBreaker extends JFrame {
         // Add ball
         ball = new Ball(this, frameBoundX, frameBoundY);
         panel.add(ball);
+        setVisible(true);
+
+        Ball ball2 = new Ball(this, frameBoundX, frameBoundY);
+        panel.add(ball2);
+        setVisible(true);
+
+        Ball ball3 = new Ball(this, frameBoundX, frameBoundY);
+        panel.add(ball3);
+        setVisible(true);
+
+        Ball ball4 = new Ball(this, frameBoundX, frameBoundY);
+        panel.add(ball4);
+        setVisible(true);
+                
+        Ball jfd = new Ball(this, frameBoundX, frameBoundY);
+        panel.add(jfd);
+        setVisible(true);
+
+        Ball lks = new Ball(this, frameBoundX, frameBoundY);
+        panel.add(lks);
+        setVisible(true);
+
+        Ball mm = new Ball(this, frameBoundX, frameBoundY);
+        panel.add(mm);
         setVisible(true);
 
         // Add background
