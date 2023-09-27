@@ -12,12 +12,12 @@ import java.awt.Rectangle;
 public class Ball extends JComponent {
 
     // Global variables.
-    int x = 300; // Starting x coordinate
-    int y = 528; // Starting y coordinate
+    int x = 183; // Starting x coordinate
+    int y = 533; // Starting y coordinate
     final int ballDiameter = 20;
     int frameBoundX, frameBoundY;
-    boolean move_up = false;
-    boolean move_left = true;
+    boolean move_up = true;
+    boolean move_left = false;
     private BrickBreaker game;
 
     public Ball(BrickBreaker game, int xb, int yb) {
@@ -26,7 +26,7 @@ public class Ball extends JComponent {
         this.game = game;
 
         // The timer is used to repaint the component.
-        Timer timer = new Timer(2000, new ActionListener() {
+        Timer timer = new Timer(4, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (collision()) {
                     System.out.println(String.format("Ball's coordinates: %d, %d\n"
@@ -37,25 +37,52 @@ public class Ball extends JComponent {
                     System.out.println(String.format("x: %d, y: %d, sliderX: %d, sliderY: %d, balldiameter/1.5: %f", x,
                             y, game.slider.getBounds().x, game.slider.getBounds().y, (ballDiameter / 1.5)));
                     // Vertical now working
-                    if (y + ballDiameter <= game.slider.getBounds().y + 1 &&
-                            x + ballDiameter >= game.slider.getBounds().x &&
-                            x <= game.slider.getBounds().x + game.slider.getBounds().width) {
+                    if (x + ballDiameter >= game.slider.getBounds().x &&
+                            x <= game.slider.getBounds().x + game.slider.getBounds().width &&
+                            y + ballDiameter - 1 <= game.slider.getBounds().y) {
                         System.out.println("Move up!");
                         move_up = true;
-                    } else if (y >= game.slider.getBounds().y - 1 &&
-                            x + ballDiameter >= game.slider.getBounds().x &&
-                            x <= game.slider.getBounds().x + game.slider.getBounds().width) {
+                    } else if (x + ballDiameter >= game.slider.getBounds().x && //
+                            x <= game.slider.getBounds().x + game.slider.getBounds().width &&
+                            y >= game.slider.getBounds().y + game.slider.getBounds().height - 1) {
                         System.out.println("Move down!");
                         move_up = false;
-                    } else if (x < game.slider.getBounds().x &&
-                            y - ballDiameter <= game.slider.getBounds().y + game.slider.getBounds().height) {
+                    } else if (x <= game.slider.getBounds().x &&
+                            y > game.slider.getBounds().y - ballDiameter &&
+                            y < game.slider.getBounds().y + game.slider.getBounds().height) {
                         System.out.println("Go Left");
                         move_left = true;
-                    } else if (x >= (game.slider.getBounds().x + game.slider.getBounds().width - 1) &&
-                            y <= game.slider.getBounds().y + game.slider.getBounds().height) {
+                    } else if (x >= game.slider.getBounds().x + game.slider.getBounds().width - 1 &&
+                            y > game.slider.getBounds().y - ballDiameter &&
+                            y < game.slider.getBounds().y + game.slider.getBounds().height) {
                         System.out.println("Go Right");
                         move_left = false;
                     }
+
+                    // System.out.println("\nMOVE UP Debug");
+                    // System.out.println(String.format("%d >= %d\n%d <= %d\n%d < %d",
+                    // x + ballDiameter, game.slider.getBounds().x,
+                    // x, game.slider.getBounds().x + game.slider.getBounds().width,
+                    // y + ballDiameter, game.slider.getBounds().y));
+
+                    // System.out.println("\nMOVE LEFT Debug");
+                    // System.out.println(String.format("%d <= %d\n%d > %d\n%d < %d",
+                    // x, game.slider.getBounds().x,
+                    // y, game.slider.getBounds().y - ballDiameter,
+                    // y, game.slider.getBounds().y + game.slider.getBounds().height));
+
+                    // System.out.println("\nMOVE RIGHT Debug");
+                    // System.out.println(String.format("%d >= %d\n%d > %d\n%d < %d",
+                    // x, game.slider.getBounds().x + game.slider.getBounds().width,
+                    // y, game.slider.getBounds().y - ballDiameter,
+                    // y, game.slider.getBounds().y + game.slider.getBounds().height));
+
+                    // System.out.println("\nMOVE DOWN Debug");
+                    // System.out.println(String.format("%d >= %d\n"
+                    // + "%d <= %d\n"
+                    // + "%d > %d", x + ballDiameter, game.slider.getBounds().x,
+                    // x, game.slider.getBounds().x + game.slider.getBounds().width,
+                    // y, game.slider.getBounds().y + game.slider.getBounds().height));
                 }
 
                 // Vertical handling
