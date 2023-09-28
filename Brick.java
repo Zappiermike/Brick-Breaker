@@ -29,12 +29,13 @@ public class Brick extends JComponent {
         return new Rectangle(x, y, width, height);
     }
 
-    public void reduceHealth(){
+    public int reduceHealth(){
         this.health--;
         if (this.health < 1){
             System.out.println("Brick has zero health! Disappearing!");
             setVisible(false);
         }
+        return this.health;
     }
 
 }
