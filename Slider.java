@@ -11,16 +11,22 @@ public class Slider extends JComponent implements KeyListener {
     private final int y;
     private int width;
     private int height;
-    private BrickBreaker game;
 
-    public Slider(BrickBreaker game, int x, int y, int width, int height) {
-        this.game = game;
+    public Slider(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         setFocusable(true);
+        // addKeyListener(this);
+    }
+
+    public void start(){
         addKeyListener(this);
+    }
+
+    public void end(){
+        removeKeyListener(this);
     }
 
     @Override

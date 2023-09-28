@@ -12,11 +12,10 @@ import java.awt.Rectangle;
 public class Ball extends JComponent {
 
     // Global variables.
-    // int x = (int) (Math.random() * 1000) % 500; // Starting x coordinate
-    int x = 200; // Starting x coordinate
-    int y = 220; // Starting y coordinate
-    final int ballDiameter = 20;
-    int frameBoundX, frameBoundY;
+    private int x = 220; // Starting x coordinate
+    private int y = 480; // Starting y coordinate
+    private final int ballDiameter = 20;
+    private int frameBoundX, frameBoundY;
     boolean move_up = true;
     boolean move_left = true;
     private BrickBreaker game;
@@ -28,17 +27,11 @@ public class Ball extends JComponent {
         this.game = game;
 
         // The timer is used to repaint the component.
-        timer = new Timer(3, new ActionListener() {
+        timer = new Timer(5, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+
+                // If ball hits the slider
                 if (sliderCollision()) {
-                    System.out.println(String.format("Ball's coordinates: %d, %d\n"
-                            + "Slider's coordinates %d, %d\n",
-                            getBounds().x, getBounds().y,
-                            game.slider.getBounds().x,
-                            game.slider.getBounds().y));
-                    System.out.println(String.format("x: %d, y: %d, sliderX: %d, sliderY: %d, balldiameter/1.5: %f", x,
-                            y, game.slider.getBounds().x, game.slider.getBounds().y, (ballDiameter / 1.5)));
-                    // Vertical now working
                     if (x + ballDiameter >= game.slider.getBounds().x &&
                             x <= game.slider.getBounds().x + game.slider.getBounds().width &&
                             y + ballDiameter - 1 <= game.slider.getBounds().y) {
@@ -61,38 +54,37 @@ public class Ball extends JComponent {
                         move_left = false;
                     }
                 }
+
+                // If the ball hits a brick
                 Brick hitBrick = brickCollision();
                 if (hitBrick != null) {
-                    System.out.println("COLLISION WITH BRICK");
                     if (x + ballDiameter >= hitBrick.getBounds().x &&
                             x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
                             y + ballDiameter - 1 <= hitBrick.getBounds().y) {
-                        System.out.println("Move up!");
                         move_up = true;
                     } else if (x + ballDiameter >= hitBrick.getBounds().x && //
                             x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
                             y >= hitBrick.getBounds().y + hitBrick.getBounds().height - 1) {
-                        System.out.println("Move down!");
                         move_up = false;
                     } else if (x <= hitBrick.getBounds().x &&
                             y > hitBrick.getBounds().y - ballDiameter &&
                             y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
-                        System.out.println("Go Left");
                         move_left = true;
                     } else if (x >= hitBrick.getBounds().x + hitBrick.getBounds().width - 1 &&
                             y > hitBrick.getBounds().y - ballDiameter &&
                             y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
-                        System.out.println("Go Right");
                         move_left = false;
                     }
-                    if (hitBrick.reduceHealth() < 1){
+
+                    if (hitBrick.reduceHealth() < 1) {
                         game.brickList.remove(hitBrick);
                     }
                 }
 
-                // Vertical handling
+                // If the ball hits a wall
                 if (y > getHeight() - ballDiameter) {
-                    move_up = true;
+                    game.gameOver = true;
+                    return;
                 }
 
                 if (y < 0) {
@@ -122,7 +114,9 @@ public class Ball extends JComponent {
                 repaint();
             }
         });
+    }
 
+    public void start() {
         timer.start();
     }
 

@@ -1,5 +1,4 @@
 import javax.swing.JComponent;
-
 import java.awt.Rectangle;
 import java.awt.Color;
 import java.awt.Graphics;
