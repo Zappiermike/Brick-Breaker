@@ -64,7 +64,30 @@ public class Ball extends JComponent {
                 Brick hitBrick = brickCollision();
                 if (hitBrick != null) {
                     System.out.println("COLLISION WITH BRICK");
-                    hitBrick.reduceHealth();
+                    if (x + ballDiameter >= hitBrick.getBounds().x &&
+                            x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
+                            y + ballDiameter - 1 <= hitBrick.getBounds().y) {
+                        System.out.println("Move up!");
+                        move_up = true;
+                    } else if (x + ballDiameter >= hitBrick.getBounds().x && //
+                            x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
+                            y >= hitBrick.getBounds().y + hitBrick.getBounds().height - 1) {
+                        System.out.println("Move down!");
+                        move_up = false;
+                    } else if (x <= hitBrick.getBounds().x &&
+                            y > hitBrick.getBounds().y - ballDiameter &&
+                            y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
+                        System.out.println("Go Left");
+                        move_left = true;
+                    } else if (x >= hitBrick.getBounds().x + hitBrick.getBounds().width - 1 &&
+                            y > hitBrick.getBounds().y - ballDiameter &&
+                            y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
+                        System.out.println("Go Right");
+                        move_left = false;
+                    }
+                    if (hitBrick.reduceHealth() < 1){
+                        game.brickList.remove(hitBrick);
+                    }
                 }
 
                 // Vertical handling
