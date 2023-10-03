@@ -1,14 +1,24 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.net.URL;
 import java.util.ArrayList;
+
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
+import javax.swing.border.Border;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class BrickBreaker {
 
+    private Timer gameTime;
     boolean gameOver = false;
     int frameBoundX = 500;
     int frameBoundY = 600;
@@ -35,9 +45,9 @@ public class BrickBreaker {
         frame.setVisible(true);
 
         // Add ball
-        ball = new Ball(this, frameBoundX, frameBoundY);
-        panel.add(ball);
-        frame.setVisible(true);
+        // ball = new Ball(this, frameBoundX, frameBoundY);
+        // panel.add(ball);
+        // frame.setVisible(true);
 
         // Add Bricks
         generateBricks();
@@ -54,6 +64,18 @@ public class BrickBreaker {
                 backgroundIcon.getIconHeight());
         panel.add(backgroundLabel);
         frame.setVisible(true);
+
+        gameTime = new Timer(200, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Check the game condition here and call endGame() when needed
+                if (isGameOver()) {
+                    endGame();
+                }
+            }
+        });
+
+        // Start the Timer
+        gameTime.start();
     }
 
     public void startGame() {
@@ -81,6 +103,7 @@ public class BrickBreaker {
         // panel.revalidate();
         // panel.repaint();
         slider.end();
+        gameTime.stop();
     }
 
     public boolean isGameOver() {

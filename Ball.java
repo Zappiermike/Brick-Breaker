@@ -126,7 +126,6 @@ public class Ball extends JComponent {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.red);
         g2d.fillOval(x, y, ballDiameter, ballDiameter);
-        g2d.dispose();
         Toolkit.getDefaultToolkit().sync();
     }
 

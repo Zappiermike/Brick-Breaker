@@ -21,7 +21,6 @@ public class Brick extends JComponent {
         super.paintComponent(g);
         g.setColor(Color.MAGENTA);
         g.fillRect(x, y, width, height);
-        g.dispose();
     }
 
     public Rectangle getBounds() {

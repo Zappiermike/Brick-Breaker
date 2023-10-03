@@ -34,7 +34,6 @@ public class Slider extends JComponent implements KeyListener {
         super.paintComponent(g);
         g.setColor(Color.RED);
         g.fillRect(x, y, width, height);
-        g.dispose();
     }
 
     @Override
