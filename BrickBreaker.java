@@ -41,20 +41,15 @@ public class BrickBreaker {
 }
 
 class MyPanel extends JPanel {
-    // Background
     private BufferedImage background;
 
-    // Slider
     Slider slider = new Slider(200, 500, 100, 30);
-
-    // Brick list
     ArrayList<Brick> brickList = new ArrayList<Brick>();
-
-    // Ball
     Ball ball = new Ball(slider, brickList);
 
-    boolean isGameRunning = false;
+    Timer gameTimer;
     JLabel welcomeSign;
+    boolean isGameRunning = false;
 
     public MyPanel() {
         setLayout(null);
@@ -77,9 +72,8 @@ class MyPanel extends JPanel {
         });
 
         // Assigning background image
-        URL resource = getClass().getResource("background.jpg");
         try {
-            background = ImageIO.read(resource);
+            background = ImageIO.read(getClass().getResource("background.jpg"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,12 +81,19 @@ class MyPanel extends JPanel {
         // Call to create bricks
         generateBricks();
 
-        // Create welcome sign
-        welcomeSign = new JLabel("Press [ENTER] or [SPACE] to start!");
-        welcomeSign.setFont(new Font("Arial", Font.BOLD, 20));
-        welcomeSign.setForeground(Color.WHITE);
-        welcomeSign.setBounds(90, 250, 400, 30);
-        add(welcomeSign);
+        // Generate start text
+        createWelcomeSign();
+
+        this.gameTimer = new Timer(200, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Check the game condition here and call endGame() when needed
+                if (ball.isGameOver()) {
+                    endGame();
+                }
+            }
+        });
+
+        gameTimer.start();
     }
 
     public void paintComponent(Graphics g) {
@@ -103,6 +104,22 @@ class MyPanel extends JPanel {
         for (Brick brick : brickList) { // add bricks
             brick.paintBrick(g);
         }
+    }
+
+    public void createWelcomeSign() {
+        welcomeSign = new JLabel("Press [ENTER] or [SPACE] to start!");
+        welcomeSign.setFont(new Font("Arial", Font.BOLD, 20));
+        welcomeSign.setForeground(Color.WHITE);
+        welcomeSign.setBounds(90, 250, 400, 30);
+        add(welcomeSign);
+    }
+
+    public void createEndSign(){
+        JLabel endSign = new JLabel("GAME OVER");
+        endSign.setFont(new Font("Arial", Font.BOLD, 20));
+        endSign.setForeground(Color.WHITE);
+        endSign.setBounds(90, 250, 400, 30);
+        add(endSign);
     }
 
     public void generateBricks() {
@@ -182,16 +199,13 @@ class MyPanel extends JPanel {
                     }
                 }
 
-                // If the ball hits a wall
-                // if (ball.y > getHeight() - ball.ballDiameter) {
-                // game.gameOver = true;
-                // return;
-                // }
-
-                if (ball.y + ball.ballDiameter > 600) {
-                    ball.move_up = true;
+                // If ball hits bottom
+                if (ball.y > getHeight() - ball.ballDiameter) {
+                    ball.setGameOver(true);
+                    return;
                 }
 
+                // If the ball hits a wall
                 if (ball.y < 0) {
                     ball.move_up = false;
                 }
@@ -246,6 +260,12 @@ class MyPanel extends JPanel {
 
     public Dimension getPreferredSize() {
         return new Dimension(500, 600);
+    }
+
+    public void endGame() {
+        createEndSign();
+        this.setEnabled(false);
+
     }
 }
 
@@ -329,23 +349,23 @@ class Brick {
 class Ball {
 
     // Global variables.
-    public int x = 220; // Starting x coordinate
-    public int y = 480; // Starting y coordinate
-    public final int ballDiameter = 20;
-    boolean move_up = true;
-    boolean move_left = true;
+    public int x, y; // x, y coordinates of ball
+    boolean move_up, move_left; // Direction of ball
     public Slider slider;
     public ArrayList<Brick> brickList;
     public Timer timer;
+    private boolean gameOver;
+    public final int ballDiameter = 20;
 
     public Ball(Slider s, ArrayList<Brick> b) {
         this.slider = s;
         this.brickList = b;
+        this.x = 220;
+        this.y = 480;
+        this.move_up = true;
+        this.move_left = true;
+        this.gameOver = false;
     }
-
-    // public void start() {
-    // timer.start();
-    // }
 
     public void paintBall(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -370,5 +390,17 @@ class Ball {
             }
         }
         return null;
+    }
+
+    public boolean isGameOver() {
+        return this.gameOver;
+    }
+
+    public void setGameOver(boolean b) {
+        this.gameOver = b;
+    }
+
+    public void disable() {
+        
     }
 }
