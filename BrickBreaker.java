@@ -82,7 +82,7 @@ class MyPanel extends JPanel {
         generateBricks();
 
         // Generate start text
-        createWelcomeSign();
+        displayWelcomeSign();
 
         this.gameTimer = new Timer(200, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -106,7 +106,7 @@ class MyPanel extends JPanel {
         }
     }
 
-    public void createWelcomeSign() {
+    public void displayWelcomeSign() {
         welcomeSign = new JLabel("Press [ENTER] or [SPACE] to start!");
         welcomeSign.setFont(new Font("Arial", Font.BOLD, 20));
         welcomeSign.setForeground(Color.WHITE);
@@ -114,11 +114,11 @@ class MyPanel extends JPanel {
         add(welcomeSign);
     }
 
-    public void createEndSign(){
+    public void displayEndSign() {
         JLabel endSign = new JLabel("GAME OVER");
         endSign.setFont(new Font("Arial", Font.BOLD, 20));
         endSign.setForeground(Color.WHITE);
-        endSign.setBounds(90, 250, 400, 30);
+        endSign.setBounds(187, 250, 500, 30);
         add(endSign);
     }
 
@@ -263,9 +263,8 @@ class MyPanel extends JPanel {
     }
 
     public void endGame() {
-        createEndSign();
+        displayEndSign();
         this.setEnabled(false);
-
     }
 }
 
@@ -401,6 +400,6 @@ class Ball {
     }
 
     public void disable() {
-        
+
     }
 }
