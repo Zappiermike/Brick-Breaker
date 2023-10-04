@@ -27,16 +27,13 @@ public class BrickBreaker {
     boolean gameOver = false;
     int frameBoundX = 500;
     int frameBoundY = 600;
-    JFrame frame;
-    JPanel panel;
-    notABall ball;
 
     public BrickBreaker() {
 
         System.out.println("Created GUI on EDT? " + SwingUtilities.isEventDispatchThread());
         JFrame frame = new JFrame("Brick Breaker");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        panel = new MyPanel();
+        JPanel panel = new MyPanel();
         panel.setFocusable(true);
         frame.add(panel);
         frame.pack();
@@ -100,20 +97,16 @@ class MyPanel extends JPanel {
     // Ball
     Ball ball = new Ball(slider, brickList);
     
+    boolean gameRunning = false;
+    
     public MyPanel() {
-        URL resource = getClass().getResource("background.jpg");
-        try {
-            background = ImageIO.read(resource);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         
-        setBorder(BorderFactory.createLineBorder(Color.black));
         addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
                 int keycode = e.getKeyCode();
-                if (keycode == KeyEvent.VK_ENTER || keycode == KeyEvent.VK_SPACE){
+                if ((keycode == KeyEvent.VK_ENTER || keycode == KeyEvent.VK_SPACE) && !gameRunning){
                     startBall();
+                    gameRunning = true;
                 }
                 moveSlider(e);
             }
@@ -121,9 +114,17 @@ class MyPanel extends JPanel {
             public void keyTyped(KeyEvent e) {}
         });
 
+        // Assigning background image
+        URL resource = getClass().getResource("background.jpg");
+        try {
+            background = ImageIO.read(resource);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Call to create bricks
         generateBricks();
 
-        // startBall();
     }
 
     public void paintComponent(Graphics g) {
