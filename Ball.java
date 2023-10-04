@@ -56,7 +56,7 @@ public class Ball extends JComponent {
                 }
 
                 // If the ball hits a brick
-                Brick hitBrick = brickCollision();
+                notABrick hitBrick = brickCollision();
                 if (hitBrick != null) {
                     if (x + ballDiameter >= hitBrick.getBounds().x &&
                             x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
@@ -137,8 +137,8 @@ public class Ball extends JComponent {
         return game.slider.getBounds().intersects(getBounds());
     }
 
-    private Brick brickCollision() {
-        for (Brick brick : game.brickList) {
+    private notABrick brickCollision() {
+        for (notABrick brick : game.brickList) {
             if (brick.getBounds().intersects(getBounds())) {
                 return brick;
             }

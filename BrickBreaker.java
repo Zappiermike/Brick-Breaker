@@ -35,7 +35,7 @@ public class BrickBreaker {
     JPanel panel;
     Ball ball;
     notASlider slider;
-    ArrayList<Brick> brickList = new ArrayList<Brick>();
+    ArrayList<notABrick> brickList = new ArrayList<notABrick>();
 
     public BrickBreaker() {
 
@@ -125,25 +125,15 @@ public class BrickBreaker {
         return gameOver;
     }
 
-    public void generateBricks() {
-        // Unique starting and iterating numbers are due to the window size
-        // while also spacing out the bricks evenly
-        for (int row = 10; row <= 85; row += 35) {
-            for (int b = 5; b < frameBoundX; b += 99) {
-                System.out.println("Generating brick #" + b);
-                Brick brick = new Brick(b, row);
-                brickList.add(brick);
-            }
-        }
-    }
+
 
 }
 
 class MyPanel extends JPanel {
+    ArrayList<Brick> brickList = new ArrayList<Brick>();
 
     // Add slider
     Slider slider = new Slider(200, 500, 100, 30);
-    // f.add(slider);
 
     public MyPanel() {
         setBorder(BorderFactory.createLineBorder(Color.black));
@@ -162,6 +152,20 @@ class MyPanel extends JPanel {
                 System.out.println();
             }
         });
+
+        generateBricks();
+    }
+
+    public void generateBricks() {
+        // Unique starting and iterating numbers are due to the window size
+        // while also spacing out the bricks evenly
+        for (int row = 10; row <= 85; row += 35) {
+            for (int b = 5; b < 500; b += 99) {
+                System.out.println("Generating brick #" + b);
+                Brick brick = new Brick(b, row);
+                brickList.add(brick);
+            }
+        }
     }
 
     public void moveSlider(KeyEvent e) {
@@ -193,6 +197,9 @@ class MyPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         slider.paintSlider(g);
+        for (Brick brick : brickList) {
+            brick.paintBrick(g);
+        }
 
     }
 }
@@ -239,4 +246,37 @@ class Slider {
     public Rectangle getBounds() {
         return new Rectangle(x, y, width, height);
     }
+}
+
+class Brick{
+
+    private int x;
+    private int y;
+    private int width = 94;
+    private int height = 30;
+    private int health = 1;
+
+    public Brick(int startingX, int startingY) {
+        this.x = startingX;
+        this.y = startingY;
+    }
+
+    public void paintBrick(Graphics g) {
+        g.setColor(Color.MAGENTA);
+        g.fillRect(x, y, width, height);
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, width, height);
+    }
+
+    public int reduceHealth(){
+        this.health--;
+        if (this.health < 1){
+            System.out.println("Brick has zero health! Disappearing!");
+            // setVisible(false);
+        }
+        return this.health;
+    }
+
 }
