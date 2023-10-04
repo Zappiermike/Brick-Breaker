@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.RenderingHints.Key;
 import java.net.URL;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
@@ -87,19 +88,18 @@ public class BrickBreaker {
 }
 
 class MyPanel extends JPanel {
-    // Add Background
+    // Background
     private BufferedImage background;
     
-    // Add slider
+    // Slider
     Slider slider = new Slider(200, 500, 100, 30);
     
     // Brick list
     ArrayList<Brick> brickList = new ArrayList<Brick>();
 
-    // Add Ball
+    // Ball
     Ball ball = new Ball(slider, brickList);
     
-
     public MyPanel() {
         URL resource = getClass().getResource("background.jpg");
         try {
@@ -111,6 +111,10 @@ class MyPanel extends JPanel {
         setBorder(BorderFactory.createLineBorder(Color.black));
         addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
+                int keycode = e.getKeyCode();
+                if (keycode == KeyEvent.VK_ENTER || keycode == KeyEvent.VK_SPACE){
+                    startBall();
+                }
                 moveSlider(e);
             }
             public void keyReleased(KeyEvent e) {}
@@ -118,15 +122,16 @@ class MyPanel extends JPanel {
         });
 
         generateBricks();
-        startBall();
+
+        // startBall();
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(background, 0, 0, null);    // background
-        slider.paintSlider(g);                               // slider 
-        ball.paintBall(g);                                   // ball
-        for (Brick brick : brickList) {                      // bricks
+        g.drawImage(background, 0, 0, null);    // add background
+        slider.paintSlider(g);                               // add slider 
+        ball.paintBall(g);                                   // add ball
+        for (Brick brick : brickList) {                      // add bricks
             brick.paintBrick(g);
         }
     }
