@@ -3,9 +3,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.RenderingHints.Key;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -33,14 +36,11 @@ public class BrickBreaker {
     int frameBoundY = 600;
     JFrame frame;
     JPanel panel;
-    Ball ball;
-    notASlider slider;
-    ArrayList<notABrick> brickList = new ArrayList<notABrick>();
+    notABall ball;
 
     public BrickBreaker() {
 
-        System.out.println("Created GUI on EDT? " +
-                SwingUtilities.isEventDispatchThread());
+        System.out.println("Created GUI on EDT? " + SwingUtilities.isEventDispatchThread());
         JFrame f = new JFrame("Brick Breaker");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panel = new MyPanel();
@@ -124,16 +124,20 @@ public class BrickBreaker {
     public boolean isGameOver() {
         return gameOver;
     }
-
-
-
 }
 
 class MyPanel extends JPanel {
-    ArrayList<Brick> brickList = new ArrayList<Brick>();
 
+    
     // Add slider
     Slider slider = new Slider(200, 500, 100, 30);
+    
+    // Brick list
+    ArrayList<Brick> brickList = new ArrayList<Brick>();
+
+    // Add Ball
+    Ball ball = new Ball(slider, brickList);
+    
 
     public MyPanel() {
         setBorder(BorderFactory.createLineBorder(Color.black));
@@ -154,6 +158,7 @@ class MyPanel extends JPanel {
         });
 
         generateBricks();
+        startBall(ball);
     }
 
     public void generateBricks() {
@@ -166,6 +171,111 @@ class MyPanel extends JPanel {
                 brickList.add(brick);
             }
         }
+    }
+
+    public void startBall(Ball ball){
+            // The timer is used to repaint the component.
+        ball.timer = new Timer(5, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                // If ball hits the slider
+                if (ball.sliderCollision()) {
+                    // Go Up
+                    if (ball.x + ball.ballDiameter >= slider.getBounds().x &&
+                            ball.x <= slider.getBounds().x + slider.getBounds().width &&
+                            ball.y + ball.ballDiameter - 1 <= slider.getBounds().y) {
+                        System.out.println("Move up!");
+                        ball.move_up = true;
+                    // Go Down
+                    } else if (ball.x + ball.ballDiameter >= slider.getBounds().x && //
+                            ball.x <= slider.getBounds().x + slider.getBounds().width &&
+                            ball.y >= slider.getBounds().y + slider.getBounds().height - 1) {
+                        System.out.println("Move down!");
+                        ball.move_up = false;
+                    // Go Left
+                    } else if (ball.x <= slider.getBounds().x &&
+                            ball.y > slider.getBounds().y - ball.ballDiameter &&
+                            ball.y < slider.getBounds().y + slider.getBounds().height) {
+                        System.out.println("Go Left");
+                        ball.move_left = true;
+                    // Go Right
+                    } else if (ball.x >= slider.getBounds().x + slider.getBounds().width - 1 &&
+                            ball.y > slider.getBounds().y - ball.ballDiameter &&
+                            ball.y < slider.getBounds().y + slider.getBounds().height) {
+                        System.out.println("Go Right");
+                        ball.move_left = false;
+                    }
+                }
+
+                // If the ball hits a brick
+                Brick hitBrick = ball.brickCollision();
+                if (hitBrick != null) {
+                    // Go Up
+                    if (ball.x + ball.ballDiameter >= hitBrick.getBounds().x &&
+                            ball.x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
+                            ball.y + ball.ballDiameter - 1 <= hitBrick.getBounds().y) {
+                        ball.move_up = true;
+                    // Go Down
+                    } else if (ball.x + ball.ballDiameter >= hitBrick.getBounds().x && //
+                            ball.x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
+                            ball.y >= hitBrick.getBounds().y + hitBrick.getBounds().height - 1) {
+                        ball.move_up = false;
+                    // Go Left
+                    } else if (ball.x <= hitBrick.getBounds().x &&
+                            ball.y > hitBrick.getBounds().y - ball.ballDiameter &&
+                            ball.y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
+                        ball.move_left = true;
+                    // Go Right
+                    } else if (ball.x >= hitBrick.getBounds().x + hitBrick.getBounds().width - 1 &&
+                            ball.y > hitBrick.getBounds().y - ball.ballDiameter &&
+                            ball.y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
+                        ball.move_left = false;
+                    }
+
+                    // Reduce health of brick and remove from screen if no health
+                    if (hitBrick.reduceHealth() < 1) {
+                        brickList.remove(hitBrick);
+                    }
+                }
+
+                // If the ball hits a wall
+                // if (ball.y > getHeight() - ball.ballDiameter) {
+                //     game.gameOver = true;
+                //     return;
+                // }
+
+                if (ball.y + ball.ballDiameter > 600){
+                    ball.move_up = true;
+                }
+
+                if (ball.y < 0) {
+                    ball.move_up = false;
+                }
+
+                if (ball.move_up) {
+                    ball.y -= 1;
+                } else {
+                    ball.y += 1;
+                }
+
+                // Horizontal
+                if (ball.x > 500 - ball.ballDiameter) {
+                    ball.move_left = true;
+                }
+
+                if (ball.x < 0) {
+                    ball.move_left = false;
+                }
+
+                if (ball.move_left) {
+                    ball.x -= 1;
+                } else {
+                    ball.x += 1;
+                }
+                repaint();
+            }
+        });
+        ball.timer.start();
     }
 
     public void moveSlider(KeyEvent e) {
@@ -197,10 +307,10 @@ class MyPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         slider.paintSlider(g);
+        ball.paintBall(g);
         for (Brick brick : brickList) {
             brick.paintBrick(g);
         }
-
     }
 }
 
@@ -279,4 +389,51 @@ class Brick{
         return this.health;
     }
 
+}
+
+class Ball {
+
+    // Global variables.
+    public int x = 220; // Starting x coordinate
+    public int y = 480; // Starting y coordinate
+    public final int ballDiameter = 20;
+    boolean move_up = true;
+    boolean move_left = true;
+    public Slider slider;
+    public ArrayList<Brick> brickList;
+    public Timer timer;
+
+    public Ball(Slider s, ArrayList<Brick> b) {
+        this.slider = s;
+        this.brickList = b;    
+    }
+
+    // public void start() {
+    //     timer.start();
+    // }
+
+    public void paintBall(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(Color.red);
+        g2d.fillOval(x, y, ballDiameter, ballDiameter);
+        Toolkit.getDefaultToolkit().sync();
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, ballDiameter, ballDiameter);
+    }
+
+    public boolean sliderCollision() {
+        return slider.getBounds().intersects(getBounds());
+    }
+
+    public Brick brickCollision() {
+        for (Brick brick : brickList) {
+            if (brick.getBounds().intersects(getBounds())) {
+                return brick;
+            }
+        }
+        return null;
+    }
 }
