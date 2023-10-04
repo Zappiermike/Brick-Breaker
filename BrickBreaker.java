@@ -1,32 +1,24 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Rectangle;
-import java.awt.RenderingHints.Key;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.net.URL;
 import java.util.ArrayList;
-
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.border.Border;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class BrickBreaker {
 
@@ -41,44 +33,13 @@ public class BrickBreaker {
     public BrickBreaker() {
 
         System.out.println("Created GUI on EDT? " + SwingUtilities.isEventDispatchThread());
-        JFrame f = new JFrame("Brick Breaker");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame frame = new JFrame("Brick Breaker");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panel = new MyPanel();
         panel.setFocusable(true);
-        f.add(panel);
-        f.pack();
-        f.setVisible(true);
-
-        // frame = new JFrame();
-        // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // frame.setSize(frameBoundX, frameBoundY);
-        // frame.setLocationRelativeTo(null);
-        // frame.setResizable(false);
-
-        // // Add new panel
-        // panel = new JPanel(new BorderLayout());
-        // frame.setContentPane(panel);
-
-        // // Add ball
-        // // ball = new Ball(this, frameBoundX, frameBoundY);
-        // // panel.add(ball);
-        // // frame.setVisible(true);
-
-        // // Add Bricks
-        // generateBricks();
-        // for (Brick brick : brickList) {
-        // panel.add(brick);
-        // frame.setVisible(true);
-        // }
-
-        // // Add background
-        // URL backgroundUrl = BrickBreaker.class.getResource("background.jpg");
-        // ImageIcon backgroundIcon = new ImageIcon(backgroundUrl);
-        // JLabel backgroundLabel = new JLabel(backgroundIcon);
-        // backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(),
-        // backgroundIcon.getIconHeight());
-        // panel.add(backgroundLabel);
-        // frame.setVisible(true);
+        frame.add(panel);
+        frame.pack();
+        frame.setVisible(true);
 
         gameTime = new Timer(200, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -89,7 +50,6 @@ public class BrickBreaker {
             }
         });
 
-        // Start the Timer
         gameTime.start();
     }
 
@@ -127,7 +87,8 @@ public class BrickBreaker {
 }
 
 class MyPanel extends JPanel {
-
+    // Add Background
+    private BufferedImage background;
     
     // Add slider
     Slider slider = new Slider(200, 500, 100, 30);
@@ -140,25 +101,34 @@ class MyPanel extends JPanel {
     
 
     public MyPanel() {
+        URL resource = getClass().getResource("background.jpg");
+        try {
+            background = ImageIO.read(resource);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
         setBorder(BorderFactory.createLineBorder(Color.black));
-
         addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
-                System.out.println("Key pressed!");
                 moveSlider(e);
             }
-
-            public void keyReleased(KeyEvent e) {
-                System.out.println();
-            }
-
-            public void keyTyped(KeyEvent e) {
-                System.out.println();
-            }
+            public void keyReleased(KeyEvent e) {}
+            public void keyTyped(KeyEvent e) {}
         });
 
         generateBricks();
-        startBall(ball);
+        startBall();
+    }
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(background, 0, 0, null);    // background
+        slider.paintSlider(g);                               // slider 
+        ball.paintBall(g);                                   // ball
+        for (Brick brick : brickList) {                      // bricks
+            brick.paintBrick(g);
+        }
     }
 
     public void generateBricks() {
@@ -173,7 +143,7 @@ class MyPanel extends JPanel {
         }
     }
 
-    public void startBall(Ball ball){
+    public void startBall(){
             // The timer is used to repaint the component.
         ball.timer = new Timer(5, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -302,15 +272,6 @@ class MyPanel extends JPanel {
 
     public Dimension getPreferredSize() {
         return new Dimension(500, 600);
-    }
-
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        slider.paintSlider(g);
-        ball.paintBall(g);
-        for (Brick brick : brickList) {
-            brick.paintBrick(g);
-        }
     }
 }
 
