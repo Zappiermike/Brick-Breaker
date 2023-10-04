@@ -4,7 +4,7 @@ public class Main {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 BrickBreaker gameInstance = new BrickBreaker();
-                gameInstance.startGame();
+                // gameInstance.startGame();
             }
         });
     }
