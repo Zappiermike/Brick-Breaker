@@ -13,8 +13,13 @@
 - Reduce number of hard-coded values
 - Reevaluate scope view of functions/methods
 - Smoothen out slider
+- Structure repo properly with folders etc.
 
 ### Versions
+1.1
+- Added scoreboard
+
+
 1.0
 - Basic functionality
 - Game runs until ball hits the floor
