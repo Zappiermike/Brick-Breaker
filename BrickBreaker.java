@@ -49,9 +49,12 @@ class MyPanel extends JPanel {
 
     Timer gameTimer;
     JLabel welcomeSign;
+    JLabel scoreLabel;
     boolean isGameRunning = false;
+    int score;
 
     public MyPanel() {
+        score = 0;
         setLayout(null);
         addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
@@ -78,11 +81,9 @@ class MyPanel extends JPanel {
             e.printStackTrace();
         }
 
-        // Call to create bricks
-        generateBricks();
-
-        // Generate start text
         displayWelcomeSign();
+        generateScoreboard();
+        generateBricks();
 
         this.gameTimer = new Timer(200, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -122,6 +123,25 @@ class MyPanel extends JPanel {
         add(endSign);
     }
 
+    public void generateScoreboard() {
+        JLabel scoreboard = new JLabel("Score:");
+        scoreboard.setFont(new Font("Arial", Font.BOLD, 20));
+        scoreboard.setForeground(Color.WHITE);
+        scoreboard.setBounds(350, 570, 70, 30);
+        scoreLabel = new JLabel();
+        scoreLabel.setText(String.valueOf(score));
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        scoreLabel.setForeground(Color.WHITE);
+        scoreLabel.setBounds(420, 570, 70, 30);
+        add(scoreboard);
+        add(scoreLabel);
+    }
+
+    private void increaseScore(int amount) {
+        score += amount;
+        scoreLabel.setText(String.valueOf(score));
+    }
+
     public void generateBricks() {
         // Unique starting and iterating numbers are due to the window size
         // while also spacing out the bricks evenly
@@ -141,6 +161,7 @@ class MyPanel extends JPanel {
 
                 // If ball hits the slider
                 if (ball.sliderCollision()) {
+                    increaseScore(10);
                     // Go Up
                     if (ball.x + ball.ballDiameter >= slider.getBounds().x &&
                             ball.x <= slider.getBounds().x + slider.getBounds().width &&
@@ -171,6 +192,7 @@ class MyPanel extends JPanel {
                 // If the ball hits a brick
                 Brick hitBrick = ball.brickCollision();
                 if (hitBrick != null) {
+                    increaseScore(100);
                     // Go Up
                     if (ball.x + ball.ballDiameter >= hitBrick.getBounds().x &&
                             ball.x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
