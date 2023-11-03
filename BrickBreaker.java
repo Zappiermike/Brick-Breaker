@@ -29,7 +29,6 @@ public class BrickBreaker {
 
     public BrickBreaker() {
 
-        System.out.println("Created GUI on EDT? " + SwingUtilities.isEventDispatchThread());
         JFrame frame = new JFrame("Brick Breaker");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         MyPanel panel = new MyPanel();
@@ -147,11 +146,29 @@ class MyPanel extends JPanel {
         // while also spacing out the bricks evenly
         for (int row = 10; row <= 85; row += 35) {
             for (int b = 5; b < 500; b += 99) {
-                System.out.println("Generating brick #" + b);
                 Brick brick = new Brick(b, row);
                 brickList.add(brick);
             }
         }
+    }
+
+    public void calculateBallSpeed(){
+        double ballCenterX = ball.x + ball.ballDiameter/2;
+        double paddleWidth = slider.getWidth();
+        double paddleCenterX = slider.getX() + paddleWidth/2;
+        double speedX = ball.speedX;
+        double speedY = ball.speedY;
+
+        double speedXY = Math.sqrt(speedX*speedX + speedY*speedY);
+        double posX = (ballCenterX - paddleCenterX) / (paddleWidth/2);
+        final double influenceX = 0.75;
+
+        speedX = speedXY * posX * influenceX;
+        ball.setSpeedX(speedX);
+        
+        speedY = Math.sqrt(speedXY*speedXY - speedX*speedX) * (speedY > 0? -1 : 1);
+        ball.setSpeedY(speedY);
+        System.out.println(String.format("speedX: %f - speedY: %f", speedX, speedY));
     }
 
     public void startBall() {
@@ -167,21 +184,25 @@ class MyPanel extends JPanel {
                             ball.x <= slider.getBounds().x + slider.getBounds().width &&
                             ball.y + ball.ballDiameter - 1 <= slider.getBounds().y) {
                         System.out.println("Move up!");
+                        calculateBallSpeed();
                         ball.move_up = true;
-                        // Go Down
-                    } else if (ball.x + ball.ballDiameter >= slider.getBounds().x && //
+                    } 
+                    // Go Down
+                    else if (ball.x + ball.ballDiameter >= slider.getBounds().x && //
                             ball.x <= slider.getBounds().x + slider.getBounds().width &&
                             ball.y >= slider.getBounds().y + slider.getBounds().height - 1) {
                         System.out.println("Move down!");
                         ball.move_up = false;
-                        // Go Left
-                    } else if (ball.x <= slider.getBounds().x &&
+                    }
+                    // Go Left
+                    else if (ball.x <= slider.getBounds().x &&
                             ball.y > slider.getBounds().y - ball.ballDiameter &&
                             ball.y < slider.getBounds().y + slider.getBounds().height) {
                         System.out.println("Go Left");
                         ball.move_left = true;
-                        // Go Right
-                    } else if (ball.x >= slider.getBounds().x + slider.getBounds().width - 1 &&
+                    } 
+                    // Go Right
+                    else if (ball.x >= slider.getBounds().x + slider.getBounds().width - 1 &&
                             ball.y > slider.getBounds().y - ball.ballDiameter &&
                             ball.y < slider.getBounds().y + slider.getBounds().height) {
                         System.out.println("Go Right");
@@ -197,22 +218,22 @@ class MyPanel extends JPanel {
                     if (ball.x + ball.ballDiameter >= hitBrick.getBounds().x &&
                             ball.x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
                             ball.y + ball.ballDiameter - 1 <= hitBrick.getBounds().y) {
-                        ball.move_up = true;
+                        ball.speedY *= -1;
                         // Go Down
                     } else if (ball.x + ball.ballDiameter >= hitBrick.getBounds().x && //
                             ball.x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
                             ball.y >= hitBrick.getBounds().y + hitBrick.getBounds().height - 1) {
-                        ball.move_up = false;
+                        ball.speedY *= -1;
                         // Go Left
                     } else if (ball.x <= hitBrick.getBounds().x &&
                             ball.y > hitBrick.getBounds().y - ball.ballDiameter &&
                             ball.y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
-                        ball.move_left = true;
+                        ball.speedX *= -1;
                         // Go Right
                     } else if (ball.x >= hitBrick.getBounds().x + hitBrick.getBounds().width - 1 &&
                             ball.y > hitBrick.getBounds().y - ball.ballDiameter &&
                             ball.y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
-                        ball.move_left = false;
+                        ball.speedX *= -1;
                     }
 
                     // Reduce health of brick and remove from screen if no health
@@ -220,38 +241,25 @@ class MyPanel extends JPanel {
                         brickList.remove(hitBrick);
                     }
                 }
+                
+                // Ball hits sidewalls
+                if (ball.x > 500 - ball.ballDiameter || ball.x < 0){
+                    ball.speedX *= -1;
+                }
 
-                // If ball hits bottom
-                if (ball.y > getHeight() - ball.ballDiameter) {
+                // Ball hits ceiling or floor
+                if(ball.y < 0){
+                    ball.speedY *= -1;
+                } 
+                else if (ball.y > getHeight() - ball.ballDiameter) {
                     ball.setGameOver(true);
                     return;
                 }
 
-                // If the ball hits a wall
-                if (ball.y < 0) {
-                    ball.move_up = false;
-                }
+                ball.y += ball.speedY;
+                ball.x += ball.speedX;
 
-                if (ball.move_up) {
-                    ball.y -= 1;
-                } else {
-                    ball.y += 1;
-                }
-
-                // Horizontal
-                if (ball.x > 500 - ball.ballDiameter) {
-                    ball.move_left = true;
-                }
-
-                if (ball.x < 0) {
-                    ball.move_left = false;
-                }
-
-                if (ball.move_left) {
-                    ball.x -= 1;
-                } else {
-                    ball.x += 1;
-                }
+                System.out.println(String.format("x, y: %f, %f", ball.x, ball.y));
                 repaint();
             }
         });
@@ -263,15 +271,12 @@ class MyPanel extends JPanel {
         int speed = 20;
         switch (keyCode) {
             case KeyEvent.VK_LEFT:
-                System.out.println("Go Left!");
                 if (slider.getX() - speed >= 0) {
                     slider.setX(slider.getX() - speed);
-                    System.out.println(slider.getX());
                     repaint();
                 }
                 break;
             case KeyEvent.VK_RIGHT:
-                System.out.println("Go Right!");
                 if (slider.getX() + speed <= 500 - slider.getWidth()) {
                     slider.setX(slider.getX() + speed);
                     repaint();
@@ -358,25 +363,23 @@ class Brick {
 
     public int reduceHealth() {
         this.health--;
-        if (this.health < 1) {
-            System.out.println("Brick has zero health! Disappearing!");
-            // setVisible(false);
-        }
         return this.health;
     }
-
 }
 
 class Ball {
 
     // Global variables.
-    public int x, y; // x, y coordinates of ball
-    boolean move_up, move_left; // Direction of ball
+    public int centerX; 
     public Slider slider;
     public ArrayList<Brick> brickList;
     public Timer timer;
+    public double x, y;
+    public double speedX, speedY;
+    public boolean move_up, move_left;
     private boolean gameOver;
     public final int ballDiameter = 20;
+    public final int ballRadius = ballDiameter/2;
 
     public Ball(Slider s, ArrayList<Brick> b) {
         this.slider = s;
@@ -386,18 +389,20 @@ class Ball {
         this.move_up = true;
         this.move_left = true;
         this.gameOver = false;
+        this.speedX = 1;
+        this.speedY = 1;
     }
 
     public void paintBall(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.red);
-        g2d.fillOval(x, y, ballDiameter, ballDiameter);
+        g2d.fillOval((int)x, (int)y, ballDiameter, ballDiameter);
         Toolkit.getDefaultToolkit().sync();
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(x, y, ballDiameter, ballDiameter);
+        return new Rectangle((int)x, (int)y, ballDiameter, ballDiameter);
     }
 
     public boolean sliderCollision() {
@@ -417,11 +422,14 @@ class Ball {
         return this.gameOver;
     }
 
-    public void setGameOver(boolean b) {
-        this.gameOver = b;
+    public void setSpeedX(double newSpeedX){
+        this.speedX = newSpeedX;
     }
 
-    public void disable() {
-
+    public void setSpeedY(double newSpeedY){
+        this.speedY = newSpeedY;
     }
+
+    public void setGameOver(boolean b) {this.gameOver = b;}
+    public void disable() {}
 }
