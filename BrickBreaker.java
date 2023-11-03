@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -64,11 +65,8 @@ class MyPanel extends JPanel {
                 moveSlider(e);
             }
 
-            public void keyReleased(KeyEvent e) {
-            }
-
-            public void keyTyped(KeyEvent e) {
-            }
+            public void keyReleased(KeyEvent e) {}
+            public void keyTyped(KeyEvent e) {}
         });
 
         // Assigning background image
@@ -142,28 +140,30 @@ class MyPanel extends JPanel {
     public void generateBricks() {
         // Unique starting and iterating numbers are due to the window size
         // while also spacing out the bricks evenly
+        int health = 3;
         for (int row = 10; row <= 85; row += 35) {
             for (int b = 5; b < 500; b += 99) {
-                Brick brick = new Brick(b, row);
+                Brick brick = new Brick(b, row, health);
                 brickList.add(brick);
             }
+            health--;
         }
     }
 
-    public void calcNewBallDirection(){
-        double ballCenterX = ball.x + ball.ballDiameter/2;
+    public void calcNewBallDirection() {
+        double ballCenterX = ball.x + ball.ballDiameter / 2;
         double paddleWidth = slider.getWidth();
-        double paddleCenterX = slider.getX() + paddleWidth/2;
+        double paddleCenterX = slider.getX() + paddleWidth / 2;
         double speedX = ball.speedX;
         double speedY = ball.speedY;
 
-        double speedXY = Math.sqrt(speedX*speedX + speedY*speedY);
-        double posX = (ballCenterX - paddleCenterX) / (paddleWidth/2);
+        double speedXY = Math.sqrt(speedX * speedX + speedY * speedY);
+        double posX = (ballCenterX - paddleCenterX) / (paddleWidth / 2);
         final double influenceX = 0.75;
 
         speedX = speedXY * posX * influenceX;
-        speedY = Math.sqrt(speedXY*speedXY - speedX*speedX) * (speedY > 0? -1 : 1);
-        
+        speedY = Math.sqrt(speedXY * speedXY - speedX * speedX) * (speedY > 0 ? -1 : 1);
+
         ball.setSpeedX(speedX);
         ball.setSpeedY(speedY);
     }
@@ -182,14 +182,14 @@ class MyPanel extends JPanel {
                             ball.y + ball.ballDiameter - 1 <= slider.getBounds().y) {
                         System.out.println("Move up!");
                         calcNewBallDirection();
-                    } 
+                    }
                     // Go Left
                     else if (ball.x <= slider.getBounds().x &&
                             ball.y > slider.getBounds().y - ball.ballDiameter &&
                             ball.y < slider.getBounds().y + slider.getBounds().height) {
                         System.out.println("Go Left");
                         ball.speedX *= -1;
-                    } 
+                    }
                     // Go Right
                     else if (ball.x >= slider.getBounds().x + slider.getBounds().width - 1 &&
                             ball.y > slider.getBounds().y - ball.ballDiameter &&
@@ -198,53 +198,47 @@ class MyPanel extends JPanel {
                         ball.speedX *= -1;
                     }
                 }
-                // System.out.println(String.format("x,y: %f, %f", ball.x, ball.y));
 
                 // If the ball hits a brick
                 Brick hitBrick = ball.brickCollision();
                 if (hitBrick != null) {
                     increaseScore(100);
                     System.out.println("Collision!");
-                    int ballX = (int)ball.x;
-                    int ballY = (int)ball.y;
+                    int ballX = (int) ball.x;
+                    int ballY = (int) ball.y;
                     int ballD = ball.ballDiameter;
                     int brickX = hitBrick.getBounds().x;
                     int brickY = hitBrick.getBounds().y;
                     int brickH = hitBrick.getBounds().height;
                     int brickW = hitBrick.getBounds().width;
 
-                    
-                    System.out.println(String.format("%d >= %d and %d <= %d and %d >= %d", 
-                    ballX + ballD, brickX, //
-                            ballX, brickX + brickW,
-                            ballY, brickY + brickH - 3));
                     // Go Up
                     if (ballX + ballD >= brickX && ballX <= brickX + brickW &&
-                        ballY + ballD - 3 <= brickY) {
+                            ballY + ballD - 3 <= brickY) {
                         ball.speedY *= -1;
                         System.out.println("Go up!");
-                    } 
-                    
+                    }
+
                     // Go Down
                     else if (ballX + ballD >= brickX && //
-                             ballX <= brickX + brickW &&
-                             ballY >= brickY + brickH - 3) {
+                            ballX <= brickX + brickW &&
+                            ballY >= brickY + brickH - 3) {
                         ball.speedY *= -1;
                         System.out.println("Go down!");
-                    } 
+                    }
 
                     // Go Left
                     else if (ballX <= brickX &&
-                             ballY > brickY - ballD &&
-                             ballY < brickY + brickH) {
+                            ballY > brickY - ballD &&
+                            ballY < brickY + brickH) {
                         ball.speedX *= -1;
                         System.out.println("Go left!");
-                    } 
-                    
+                    }
+
                     // Go Right
                     else if (ballX >= brickX + brickW - 1 &&
-                             ballY > brickY - ballD &&
-                             ballY < brickY + brickH) {
+                            ballY > brickY - ballD &&
+                            ballY < brickY + brickH) {
                         ball.speedX *= -1;
                         System.out.println("Go right!");
                     }
@@ -254,24 +248,25 @@ class MyPanel extends JPanel {
                         brickList.remove(hitBrick);
                     }
                 }
-                
+
                 // Ball hits sidewalls
-                if (ball.x > 500 - ball.ballDiameter || ball.x < 0){
+                if (ball.x > 500 - ball.ballDiameter || ball.x < 0) {
                     ball.speedX *= -1;
                 }
 
-                // Ball hits ceiling or floor
-                if(ball.y < 0){
+                // Ball hits ceiling
+                if (ball.y < 0) {
                     ball.speedY *= -1;
-                } 
-                else if (ball.y > getHeight() - ball.ballDiameter) {
+                }
+
+                // Ball hits floor
+                if (ball.y > getHeight() - ball.ballDiameter) {
                     ball.setGameOver(true);
                     return;
                 }
 
                 ball.y += ball.speedY;
                 ball.x += ball.speedX;
-                System.out.println(ball.speedY);
                 repaint();
             }
         });
@@ -358,14 +353,21 @@ class Brick {
     private int width = 94;
     private int height = 30;
     private int health = 1;
+    private Color color;
+    HashMap<Integer, Color> healthColor = new HashMap<Integer, Color>(){{
+        put(1, Color.MAGENTA);
+        put(2, Color.CYAN);
+        put(3, Color.YELLOW);
+    }};
 
-    public Brick(int startingX, int startingY) {
+    public Brick(int startingX, int startingY, int health) {
         this.x = startingX;
         this.y = startingY;
+        this.health = health;
     }
 
     public void paintBrick(Graphics g) {
-        g.setColor(Color.MAGENTA);
+        g.setColor(healthColor.get(this.health));
         g.fillRect(x, y, width, height);
     }
 
@@ -382,7 +384,7 @@ class Brick {
 class Ball {
 
     // Global variables.
-    public int centerX; 
+    public int centerX;
     public Slider slider;
     public ArrayList<Brick> brickList;
     public Timer timer;
@@ -390,7 +392,7 @@ class Ball {
     public double speedX, speedY;
     private boolean gameOver;
     public final int ballDiameter = 20;
-    public final int ballRadius = ballDiameter/2;
+    public final int ballRadius = ballDiameter / 2;
 
     public Ball(Slider s, ArrayList<Brick> b) {
         this.slider = s;
@@ -406,12 +408,12 @@ class Ball {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.red);
-        g2d.fillOval((int)x, (int)y, ballDiameter, ballDiameter);
+        g2d.fillOval((int) x, (int) y, ballDiameter, ballDiameter);
         Toolkit.getDefaultToolkit().sync();
     }
 
     public Rectangle getBounds() {
-        return new Rectangle((int)x, (int)y, ballDiameter, ballDiameter);
+        return new Rectangle((int) x, (int) y, ballDiameter, ballDiameter);
     }
 
     public boolean sliderCollision() {
@@ -431,14 +433,18 @@ class Ball {
         return this.gameOver;
     }
 
-    public void setSpeedX(double newSpeedX){
+    public void setSpeedX(double newSpeedX) {
         this.speedX = newSpeedX;
     }
 
-    public void setSpeedY(double newSpeedY){
+    public void setSpeedY(double newSpeedY) {
         this.speedY = newSpeedY;
     }
 
-    public void setGameOver(boolean b) {this.gameOver = b;}
-    public void disable() {}
+    public void setGameOver(boolean b) {
+        this.gameOver = b;
+    }
+
+    public void disable() {
+    }
 }
