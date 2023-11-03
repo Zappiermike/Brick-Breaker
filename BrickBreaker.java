@@ -6,13 +6,11 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import java.net.URL;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -152,7 +150,7 @@ class MyPanel extends JPanel {
         }
     }
 
-    public void calculateBallSpeed(){
+    public void calcNewBallDirection(){
         double ballCenterX = ball.x + ball.ballDiameter/2;
         double paddleWidth = slider.getWidth();
         double paddleCenterX = slider.getX() + paddleWidth/2;
@@ -164,11 +162,10 @@ class MyPanel extends JPanel {
         final double influenceX = 0.75;
 
         speedX = speedXY * posX * influenceX;
-        ball.setSpeedX(speedX);
-        
         speedY = Math.sqrt(speedXY*speedXY - speedX*speedX) * (speedY > 0? -1 : 1);
+        
+        ball.setSpeedX(speedX);
         ball.setSpeedY(speedY);
-        System.out.println(String.format("speedX: %f - speedY: %f", speedX, speedY));
     }
 
     public void startBall() {
@@ -184,56 +181,72 @@ class MyPanel extends JPanel {
                             ball.x <= slider.getBounds().x + slider.getBounds().width &&
                             ball.y + ball.ballDiameter - 1 <= slider.getBounds().y) {
                         System.out.println("Move up!");
-                        calculateBallSpeed();
-                        ball.move_up = true;
+                        calcNewBallDirection();
                     } 
-                    // Go Down
-                    else if (ball.x + ball.ballDiameter >= slider.getBounds().x && //
-                            ball.x <= slider.getBounds().x + slider.getBounds().width &&
-                            ball.y >= slider.getBounds().y + slider.getBounds().height - 1) {
-                        System.out.println("Move down!");
-                        ball.move_up = false;
-                    }
                     // Go Left
                     else if (ball.x <= slider.getBounds().x &&
                             ball.y > slider.getBounds().y - ball.ballDiameter &&
                             ball.y < slider.getBounds().y + slider.getBounds().height) {
                         System.out.println("Go Left");
-                        ball.move_left = true;
+                        ball.speedX *= -1;
                     } 
                     // Go Right
                     else if (ball.x >= slider.getBounds().x + slider.getBounds().width - 1 &&
                             ball.y > slider.getBounds().y - ball.ballDiameter &&
                             ball.y < slider.getBounds().y + slider.getBounds().height) {
                         System.out.println("Go Right");
-                        ball.move_left = false;
+                        ball.speedX *= -1;
                     }
                 }
+                // System.out.println(String.format("x,y: %f, %f", ball.x, ball.y));
 
                 // If the ball hits a brick
                 Brick hitBrick = ball.brickCollision();
                 if (hitBrick != null) {
                     increaseScore(100);
+                    System.out.println("Collision!");
+                    int ballX = (int)ball.x;
+                    int ballY = (int)ball.y;
+                    int ballD = ball.ballDiameter;
+                    int brickX = hitBrick.getBounds().x;
+                    int brickY = hitBrick.getBounds().y;
+                    int brickH = hitBrick.getBounds().height;
+                    int brickW = hitBrick.getBounds().width;
+
+                    
+                    System.out.println(String.format("%d >= %d and %d <= %d and %d >= %d", 
+                    ballX + ballD, brickX, //
+                            ballX, brickX + brickW,
+                            ballY, brickY + brickH - 3));
                     // Go Up
-                    if (ball.x + ball.ballDiameter >= hitBrick.getBounds().x &&
-                            ball.x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
-                            ball.y + ball.ballDiameter - 1 <= hitBrick.getBounds().y) {
+                    if (ballX + ballD >= brickX && ballX <= brickX + brickW &&
+                        ballY + ballD - 3 <= brickY) {
                         ball.speedY *= -1;
-                        // Go Down
-                    } else if (ball.x + ball.ballDiameter >= hitBrick.getBounds().x && //
-                            ball.x <= hitBrick.getBounds().x + hitBrick.getBounds().width &&
-                            ball.y >= hitBrick.getBounds().y + hitBrick.getBounds().height - 1) {
+                        System.out.println("Go up!");
+                    } 
+                    
+                    // Go Down
+                    else if (ballX + ballD >= brickX && //
+                             ballX <= brickX + brickW &&
+                             ballY >= brickY + brickH - 3) {
                         ball.speedY *= -1;
-                        // Go Left
-                    } else if (ball.x <= hitBrick.getBounds().x &&
-                            ball.y > hitBrick.getBounds().y - ball.ballDiameter &&
-                            ball.y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
+                        System.out.println("Go down!");
+                    } 
+
+                    // Go Left
+                    else if (ballX <= brickX &&
+                             ballY > brickY - ballD &&
+                             ballY < brickY + brickH) {
                         ball.speedX *= -1;
-                        // Go Right
-                    } else if (ball.x >= hitBrick.getBounds().x + hitBrick.getBounds().width - 1 &&
-                            ball.y > hitBrick.getBounds().y - ball.ballDiameter &&
-                            ball.y < hitBrick.getBounds().y + hitBrick.getBounds().height) {
+                        System.out.println("Go left!");
+                    } 
+                    
+                    // Go Right
+                    else if (ballX >= brickX + brickW - 1 &&
+                             ballY > brickY - ballD &&
+                             ballY < brickY + brickH) {
                         ball.speedX *= -1;
+                        System.out.println("Go right!");
                     }
 
                     // Reduce health of brick and remove from screen if no health
@@ -258,8 +271,7 @@ class MyPanel extends JPanel {
 
                 ball.y += ball.speedY;
                 ball.x += ball.speedX;
-
-                System.out.println(String.format("x, y: %f, %f", ball.x, ball.y));
+                System.out.println(ball.speedY);
                 repaint();
             }
         });
@@ -376,7 +388,6 @@ class Ball {
     public Timer timer;
     public double x, y;
     public double speedX, speedY;
-    public boolean move_up, move_left;
     private boolean gameOver;
     public final int ballDiameter = 20;
     public final int ballRadius = ballDiameter/2;
@@ -386,8 +397,6 @@ class Ball {
         this.brickList = b;
         this.x = 220;
         this.y = 480;
-        this.move_up = true;
-        this.move_left = true;
         this.gameOver = false;
         this.speedX = 1;
         this.speedY = 1;
