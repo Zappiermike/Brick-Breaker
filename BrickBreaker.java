@@ -350,10 +350,11 @@ class Brick {
 
     private int x;
     private int y;
+    private int health;
+    private final int startingHealth;
     private int width = 94;
     private int height = 30;
-    private int health = 1;
-    private Color color;
+
     HashMap<Integer, Color> healthColor = new HashMap<Integer, Color>(){{
         put(1, Color.MAGENTA);
         put(2, Color.CYAN);
@@ -364,9 +365,11 @@ class Brick {
         this.x = startingX;
         this.y = startingY;
         this.health = health;
+        this.startingHealth = health;
     }
 
     public void paintBrick(Graphics g) {
+        // g.setColor(healthColor.get(this.startingHealth));  // No color change
         g.setColor(healthColor.get(this.health));
         g.fillRect(x, y, width, height);
     }
