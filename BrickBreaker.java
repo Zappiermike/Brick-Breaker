@@ -157,11 +157,20 @@ class MyPanel extends JPanel {
         double speedX = ball.speedX;
         double speedY = ball.speedY;
 
+        // Calculate Hypotenuse 
         double speedXY = Math.sqrt(speedX * speedX + speedY * speedY);
+
+        // Calculate the position of the ball relative to the center of the
+        // slider. Value will be between -1 and 1.
         double posX = (ballCenterX - paddleCenterX) / (paddleWidth / 2);
+
+        // Influence on strong the angle reflection can be 
         final double influenceX = 0.75;
 
+        // Calculate new speed for X
         speedX = speedXY * posX * influenceX;
+
+        // Calculate speedY based on Hypotenuse and speedX
         speedY = Math.sqrt(speedXY * speedXY - speedX * speedX) * (speedY > 0 ? -1 : 1);
 
         ball.setSpeedX(speedX);
@@ -351,7 +360,7 @@ class Brick {
     private int x;
     private int y;
     private int health;
-    private final int startingHealth;
+    // private final int startingHealth;
     private int width = 94;
     private int height = 30;
 
@@ -365,7 +374,7 @@ class Brick {
         this.x = startingX;
         this.y = startingY;
         this.health = health;
-        this.startingHealth = health;
+        // this.startingHealth = health;
     }
 
     public void paintBrick(Graphics g) {
