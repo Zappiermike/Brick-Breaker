@@ -46,12 +46,14 @@ class MyPanel extends JPanel {
     Ball ball = new Ball(slider, brickList);
 
     Timer gameTimer;
-    JLabel welcomeSign;
-    JLabel scoreLabel;
-    boolean isGameRunning = false;
+    JLabel welcomeSign, endRoundSign, endGameSign, scoreLabel, playAgain, scoreboard;
     int score;
+    int round = 0;
+    boolean roundWon = false;
+    boolean isGameRunning = false;
 
     public MyPanel() {
+        generateSigns();
         score = 0;
         setLayout(null);
         addKeyListener(new KeyListener() {
@@ -61,6 +63,10 @@ class MyPanel extends JPanel {
                     welcomeSign.setVisible(false);
                     startBall();
                     isGameRunning = true;
+                } else if (keycode == KeyEvent.VK_ENTER && isGameRunning && roundWon){
+                    System.out.println("New round!");
+                    resetComponents();
+                    roundWon = false;
                 }
                 moveSlider(e);
             }
@@ -77,19 +83,87 @@ class MyPanel extends JPanel {
         }
 
         displayWelcomeSign();
-        generateScoreboard();
+        displayScoreboard();
         generateBricks();
 
         this.gameTimer = new Timer(200, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Check the game condition here and call endGame() when needed
-                if (ball.isGameOver()) {
+                if (ball.isGameOver() && !brickList.isEmpty()) {
                     endGame();
+                }
+                if (!ball.isGameOver() && brickList.isEmpty()){
+                    endRound();
                 }
             }
         });
 
         gameTimer.start();
+    }
+
+    public void generateSigns(){
+        String welcomeMsg = "Press [ENTER] or [SPACE] to start!";
+        welcomeSign = new JLabel(welcomeMsg);
+        welcomeSign.setFont(new Font("Arial", Font.BOLD, 20));
+        welcomeSign.setForeground(Color.WHITE);
+        welcomeSign.setBounds(90, 250, 400, 30);
+        welcomeSign.setVisible(false);
+        
+        String roundWonMsg = "ROUND WON!";
+        endRoundSign = new JLabel(roundWonMsg);
+        endRoundSign.setFont(new Font("Arial", Font.BOLD, 20));
+        endRoundSign.setForeground(Color.WHITE);
+        endRoundSign.setBounds(170, 250, 500, 30);
+        endRoundSign.setVisible(false);
+
+        String gameOverMsg = "GAME OVER";
+        endGameSign = new JLabel(gameOverMsg);
+        endGameSign.setFont(new Font("Arial", Font.BOLD, 20));
+        endGameSign.setForeground(Color.WHITE);
+        endGameSign.setBounds(187, 250, 500, 30);
+        endGameSign.setVisible(false);
+
+        scoreboard = new JLabel("Score:");
+        scoreboard.setFont(new Font("Arial", Font.BOLD, 20));
+        scoreboard.setForeground(Color.WHITE);
+        scoreboard.setBounds(350, 570, 70, 30);
+        scoreboard.setVisible(false);
+
+        scoreLabel = new JLabel();
+        scoreLabel.setText(String.valueOf(score));
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        scoreLabel.setForeground(Color.WHITE);
+        scoreLabel.setBounds(420, 570, 70, 30);
+        scoreLabel.setVisible(false);
+        
+        String continueMsg = String.format("Press [ENTER] to continue " +
+                                           "to Round %d", round+2);
+        playAgain = new JLabel(continueMsg);
+        playAgain.setFont(new Font("Arial", Font.BOLD, 20));
+        playAgain.setForeground(Color.WHITE);
+        playAgain.setBounds(115, 300, 400, 30);
+        playAgain.setVisible(false);
+        
+        add(welcomeSign);
+        add(endRoundSign);
+        add(endGameSign);
+        add(scoreboard);
+        add(scoreLabel);
+        add(playAgain);
+    }
+
+    public void resetComponents(){
+        ball.timer.stop();
+        ball.x = 220;
+        ball.y = 480;
+        ball.setSpeedX(1.0f);
+        ball.setSpeedY(1.0f);
+        generateBricks();
+        slider.setX(200);
+        // removeAll();
+        playAgain.setVisible(false);
+        endRoundSign.setVisible(false);
+        ball.timer.start();
     }
 
     public void paintComponent(Graphics g) {
@@ -103,33 +177,21 @@ class MyPanel extends JPanel {
     }
 
     public void displayWelcomeSign() {
-        welcomeSign = new JLabel("Press [ENTER] or [SPACE] to start!");
-        welcomeSign.setFont(new Font("Arial", Font.BOLD, 20));
-        welcomeSign.setForeground(Color.WHITE);
-        welcomeSign.setBounds(90, 250, 400, 30);
-        add(welcomeSign);
+        welcomeSign.setVisible(true);
+    }
+
+    public void displayEndRound(){
+        endRoundSign.setVisible(true);
+        playAgain.setVisible(true);
     }
 
     public void displayEndSign() {
-        JLabel endSign = new JLabel("GAME OVER");
-        endSign.setFont(new Font("Arial", Font.BOLD, 20));
-        endSign.setForeground(Color.WHITE);
-        endSign.setBounds(187, 250, 500, 30);
-        add(endSign);
+        endGameSign.setVisible(true);
     }
 
-    public void generateScoreboard() {
-        JLabel scoreboard = new JLabel("Score:");
-        scoreboard.setFont(new Font("Arial", Font.BOLD, 20));
-        scoreboard.setForeground(Color.WHITE);
-        scoreboard.setBounds(350, 570, 70, 30);
-        scoreLabel = new JLabel();
-        scoreLabel.setText(String.valueOf(score));
-        scoreLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        scoreLabel.setForeground(Color.WHITE);
-        scoreLabel.setBounds(420, 570, 70, 30);
-        add(scoreboard);
-        add(scoreLabel);
+    public void displayScoreboard() {
+        scoreLabel.setVisible(true);
+        scoreboard.setVisible(true);
     }
 
     private void increaseScore(int amount) {
@@ -138,16 +200,21 @@ class MyPanel extends JPanel {
     }
 
     public void generateBricks() {
+        
+        Brick brick = new Brick(5, 10, 1);
+        brickList.add(brick);
+        
         // Unique starting and iterating numbers are due to the window size
         // while also spacing out the bricks evenly
-        int health = 3;
-        for (int row = 10; row <= 85; row += 35) {
-            for (int b = 5; b < 500; b += 99) {
-                Brick brick = new Brick(b, row, health);
-                brickList.add(brick);
-            }
-            health--;
-        }
+
+        // int health = 3;
+        // for (int row = 10; row <= 85; row += 35) {
+        //     for (int b = 5; b < 500; b += 99) {
+        //         Brick brick = new Brick(b, row, health);
+        //         brickList.add(brick);
+        //     }
+        //     health--;
+        // }
     }
 
     public void calcNewBallDirection() {
@@ -305,6 +372,11 @@ class MyPanel extends JPanel {
         return new Dimension(500, 600);
     }
 
+    public void endRound(){
+        roundWon = true;
+        displayEndRound();
+    }
+
     public void endGame() {
         displayEndSign();
         this.setEnabled(false);
@@ -455,8 +527,5 @@ class Ball {
 
     public void setGameOver(boolean b) {
         this.gameOver = b;
-    }
-
-    public void disable() {
     }
 }
