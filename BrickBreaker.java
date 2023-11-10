@@ -48,25 +48,28 @@ class MyPanel extends JPanel {
     Timer gameTimer;
     JLabel welcomeSign, endRoundSign, endGameSign, scoreLabel, playAgain, scoreboard;
     int score;
-    int round = 0;
+    int round = 1;
     boolean roundWon = false;
     boolean isGameRunning = false;
 
     public MyPanel() {
-        generateSigns();
         score = 0;
         setLayout(null);
+        generateSigns();
+        loadBall();
         addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
                 int keycode = e.getKeyCode();
                 if ((keycode == KeyEvent.VK_ENTER || keycode == KeyEvent.VK_SPACE) && !isGameRunning) {
                     welcomeSign.setVisible(false);
-                    startBall();
+                    releaseBall();
                     isGameRunning = true;
-                } else if (keycode == KeyEvent.VK_ENTER && isGameRunning && roundWon){
-                    System.out.println("New round!");
+                } else if (keycode == KeyEvent.VK_ENTER && isGameRunning && 
+                           roundWon){
+                    ++round;
                     resetComponents();
                     roundWon = false;
+                    isGameRunning = false;
                 }
                 moveSlider(e);
             }
@@ -86,7 +89,7 @@ class MyPanel extends JPanel {
         displayScoreboard();
         generateBricks();
 
-        this.gameTimer = new Timer(200, new ActionListener() {
+        gameTimer = new Timer(200, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Check the game condition here and call endGame() when needed
                 if (ball.isGameOver() && !brickList.isEmpty()) {
@@ -137,11 +140,11 @@ class MyPanel extends JPanel {
         scoreLabel.setVisible(false);
         
         String continueMsg = String.format("Press [ENTER] to continue " +
-                                           "to Round %d", round+2);
+                                           "to Round %d", ++round);
         playAgain = new JLabel(continueMsg);
         playAgain.setFont(new Font("Arial", Font.BOLD, 20));
         playAgain.setForeground(Color.WHITE);
-        playAgain.setBounds(115, 300, 400, 30);
+        playAgain.setBounds(60, 300, 400, 30);
         playAgain.setVisible(false);
         
         add(welcomeSign);
@@ -160,10 +163,10 @@ class MyPanel extends JPanel {
         ball.setSpeedY(1.0f);
         generateBricks();
         slider.setX(200);
-        // removeAll();
         playAgain.setVisible(false);
+        playAgain.setText("Press [ENTER] to continue to Round " + round);
         endRoundSign.setVisible(false);
-        ball.timer.start();
+        repaint();
     }
 
     public void paintComponent(Graphics g) {
@@ -244,7 +247,7 @@ class MyPanel extends JPanel {
         ball.setSpeedY(speedY);
     }
 
-    public void startBall() {
+    public void loadBall() {
         // The timer is used to repaint the component.
         ball.timer = new Timer(5, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -346,6 +349,9 @@ class MyPanel extends JPanel {
                 repaint();
             }
         });
+    }
+
+    public void releaseBall(){
         ball.timer.start();
     }
 
