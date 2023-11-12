@@ -340,7 +340,9 @@ class MyPanel extends JPanel {
 
                 // Ball hits floor
                 if (ball.y > getHeight() - ball.ballDiameter) {
-                    ball.setGameOver(true);
+                    if(!roundWon){
+                        ball.setGameOver(true);
+                    }
                     return;
                 }
 
