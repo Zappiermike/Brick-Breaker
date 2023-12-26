@@ -18,7 +18,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import org.json.simple.JSONArray; 
+import org.json.simple.JSONObject; 
+import org.json.simple.parser.*; 
 
 public class BrickBreaker {
 
@@ -67,6 +73,7 @@ class MyPanel extends JPanel {
                 } else if (keycode == KeyEvent.VK_ENTER && isGameRunning && 
                            roundWon){
                     ++round;
+                    System.out.println("Round is now " + round);
                     resetComponents();
                     roundWon = false;
                     isGameRunning = false;
@@ -87,7 +94,7 @@ class MyPanel extends JPanel {
 
         displayWelcomeSign();
         displayScoreboard();
-        generateBricks();
+        generateBricks(round);
 
         gameTimer = new Timer(200, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -140,7 +147,7 @@ class MyPanel extends JPanel {
         scoreLabel.setVisible(false);
         
         String continueMsg = String.format("Press [ENTER] to continue " +
-                                           "to Round %d", ++round);
+                                           "to Round 2");
         playAgain = new JLabel(continueMsg);
         playAgain.setFont(new Font("Arial", Font.BOLD, 20));
         playAgain.setForeground(Color.WHITE);
@@ -161,10 +168,9 @@ class MyPanel extends JPanel {
         ball.y = 480;
         ball.setSpeedX(1.0f);
         ball.setSpeedY(1.0f);
-        generateBricks();
+        generateBricks(round);
         slider.setX(200);
         playAgain.setVisible(false);
-        playAgain.setText("Press [ENTER] to continue to Round " + round);
         endRoundSign.setVisible(false);
         repaint();
     }
@@ -185,6 +191,7 @@ class MyPanel extends JPanel {
 
     public void displayEndRound(){
         endRoundSign.setVisible(true);
+        playAgain.setText(String.format("Press [ENTER] to continue to Round %d", round+1));
         playAgain.setVisible(true);
     }
 
@@ -202,21 +209,66 @@ class MyPanel extends JPanel {
         scoreLabel.setText(String.valueOf(score));
     }
 
-    public void generateBricks() {
+    public void generateBricks(int round) {
         
-        Brick brick = new Brick(5, 10, 1);
-        brickList.add(brick);
+        // Brick brick = new Brick(5, 10, 1, 94, 30);
+        // brickList.add(brick);
         
         // Unique starting and iterating numbers are due to the window size
         // while also spacing out the bricks evenly
+        try {
+            File file = new File("./Brick-Breaker/brickConfig.json");
+            if (file.exists()) {
+                Object obj = new JSONParser().parse(new FileReader(file));
+                // typecasting obj to JSONObject 
+                JSONObject brickConfig = (JSONObject) obj;
+                // System.out.println(brickConfig);
+                JSONObject roundKey = (JSONObject) brickConfig.get(Integer.toString(round));
+                System.out.println(roundKey);
 
+                int startRow    = ((Long) roundKey.get("startRow")).intValue();
+                int endRow      = ((Long) roundKey.get("endRow")).intValue();
+                int incRow      = ((Long) roundKey.get("incRow")).intValue();
+                int startCol    = ((Long) roundKey.get("startCol")).intValue();
+                int endCol      = ((Long) roundKey.get("endCol")).intValue();
+                int incCol      = ((Long) roundKey.get("incCol")).intValue();
+                int brickWidth  = ((Long) roundKey.get("brickWidth")).intValue();
+                int brickHeight = ((Long) roundKey.get("brickHeight")).intValue();
+                int health      = ((Long) roundKey.get("health")).intValue();
+                
+                System.out.println("Loading Round " + round);
+                for (int r = startRow; r < 100; r += incRow){
+                    for (int c = startCol; c < 100; c += incCol){
+                        Brick brick = new Brick(c, r, 1, brickWidth, brickHeight);
+                        brickList.add(brick);
+                    }
+                }
+            } else {
+                System.out.println("File does not exist: " + file.getAbsolutePath());
+            }
+            
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
+
+          
+        
         // int health = 3;
         // for (int row = 10; row <= 85; row += 35) {
         //     for (int b = 5; b < 500; b += 99) {
         //         Brick brick = new Brick(b, row, health);
         //         brickList.add(brick);
         //     }
-        //     health--;
+        //     if (health > 1){
+        //         health--;
+        //     }
         // }
     }
 
@@ -441,8 +493,8 @@ class Brick {
     private int y;
     private int health;
     // private final int startingHealth;
-    private int width = 94;
-    private int height = 30;
+    private int width;
+    private int height;
 
     HashMap<Integer, Color> healthColor = new HashMap<Integer, Color>(){{
         put(1, Color.MAGENTA);
@@ -450,10 +502,12 @@ class Brick {
         put(3, Color.YELLOW);
     }};
 
-    public Brick(int startingX, int startingY, int health) {
+    public Brick(int startingX, int startingY, int health, int width, int height) {
         this.x = startingX;
         this.y = startingY;
         this.health = health;
+        this.width = width;
+        this.height = height;
         // this.startingHealth = health;
     }
 

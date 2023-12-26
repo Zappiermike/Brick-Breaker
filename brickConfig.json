@@ -1,0 +1,24 @@
+{
+    "1": {
+        "health":   3,
+        "startRow": 10,
+        "endRow":   85,
+        "incRow":   35,
+        "startCol": 5,
+        "endCol":   500,
+        "incCol":   99,
+        "brickWidth": 94,
+        "brickHeight": 30
+    },
+    "2": {
+        "health":   1,
+        "startRow": 10,
+        "endRow":   85,
+        "incRow":   35,
+        "startCol": 5,
+        "endCol":   500,
+        "incCol":   99,
+        "brickWidth": 70,
+        "brickHeight": 25
+    }
+}
