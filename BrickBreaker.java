@@ -52,9 +52,10 @@ class MyPanel extends JPanel {
     Ball ball = new Ball(slider, brickList);
 
     Timer gameTimer;
-    JLabel welcomeSign, endRoundSign, endGameSign, scoreLabel, playAgain, scoreboard;
+    JLabel welcomeSign, endRoundSign, endGameSign, victorySign, scoreLabel, playAgain, scoreboard;
     int score;
     int round = 1;
+    int MAXROUNDS = 4;
     boolean roundWon = false;
     boolean isGameRunning = false;
 
@@ -103,7 +104,11 @@ class MyPanel extends JPanel {
                     endGame();
                 }
                 if (!ball.isGameOver() && brickList.isEmpty()){
-                    endRound();
+                    if (round >= MAXROUNDS){
+                        winGame();
+                    } else {
+                        endRound();
+                    }
                 }
             }
         });
@@ -133,6 +138,13 @@ class MyPanel extends JPanel {
         endGameSign.setBounds(187, 250, 500, 30);
         endGameSign.setVisible(false);
 
+        String victoryMsg = "YOU WIN!";
+        victorySign = new JLabel(victoryMsg);
+        victorySign.setFont(new Font("Arial", Font.BOLD, 30));
+        victorySign.setForeground(Color.WHITE);
+        victorySign.setBounds(180, 250, 500, 100);
+        victorySign.setVisible(false);
+
         scoreboard = new JLabel("Score:");
         scoreboard.setFont(new Font("Arial", Font.BOLD, 20));
         scoreboard.setForeground(Color.WHITE);
@@ -156,6 +168,7 @@ class MyPanel extends JPanel {
         
         add(welcomeSign);
         add(endRoundSign);
+        add(victorySign);
         add(endGameSign);
         add(scoreboard);
         add(scoreLabel);
@@ -199,6 +212,10 @@ class MyPanel extends JPanel {
         endGameSign.setVisible(true);
     }
 
+    public void displayVictorySign() {
+        victorySign.setVisible(true);
+    }
+
     public void displayScoreboard() {
         scoreLabel.setVisible(true);
         scoreboard.setVisible(true);
@@ -210,21 +227,12 @@ class MyPanel extends JPanel {
     }
 
     public void generateBricks(int round) {
-        
-        // Brick brick = new Brick(5, 10, 1, 94, 30);
-        // brickList.add(brick);
-        
-        // Unique starting and iterating numbers are due to the window size
-        // while also spacing out the bricks evenly
         try {
             File file = new File("./Brick-Breaker/brickConfig.json");
             if (file.exists()) {
                 Object obj = new JSONParser().parse(new FileReader(file));
-                // typecasting obj to JSONObject 
                 JSONObject brickConfig = (JSONObject) obj;
-                // System.out.println(brickConfig);
                 JSONObject roundKey = (JSONObject) brickConfig.get(Integer.toString(round));
-                System.out.println(roundKey);
 
                 int startRow    = ((Long) roundKey.get("startRow")).intValue();
                 int endRow      = ((Long) roundKey.get("endRow")).intValue();
@@ -235,13 +243,54 @@ class MyPanel extends JPanel {
                 int brickWidth  = ((Long) roundKey.get("brickWidth")).intValue();
                 int brickHeight = ((Long) roundKey.get("brickHeight")).intValue();
                 int health      = ((Long) roundKey.get("health")).intValue();
+                int incHealth   = ((Long) roundKey.get("incHealth")).intValue();
+                String shape    = (String) roundKey.get("shape");
                 
                 System.out.println("Loading Round " + round);
-                for (int r = startRow; r < 100; r += incRow){
-                    for (int c = startCol; c < 100; c += incCol){
-                        Brick brick = new Brick(c, r, 1, brickWidth, brickHeight);
+                switch (shape) {
+                    case "rectangle":
+                        for (int r = startRow; r < endRow; r += incRow){
+                            for (int c = startCol; c < endCol; c += incCol){
+                                Brick brick = new Brick(c, r, health, brickWidth, brickHeight);
+                                brickList.add(brick);
+                            }
+                            if (health > 1){
+                                health -= incHealth;
+                            }
+                        }
+                        break;
+                    case "invertedTriangle":
+                        for (int r = startRow; r < endRow; r += incRow){
+                            int offset = (r / incRow) * (incCol);
+                            for (int c = startCol + offset; c < endCol - offset; c += incCol){
+                                Brick brick = new Brick(c, r, health, brickWidth, brickHeight);
+                                brickList.add(brick);
+                            }
+                            if (health > 1){
+                                health -= incHealth;
+                            }
+                        }
+                        break;
+                    case "triangle":
+                        for (int r = startRow; r < endRow; r += incRow){
+                            int offset = Math.abs((r / incRow) - (endRow/incRow)) * (incCol);
+                            for (int c = startCol + offset; c < endCol - offset; c += incCol){
+                                System.out.println(c);
+                                Brick brick = new Brick(c, r, health, brickWidth, brickHeight);
+                                brickList.add(brick);
+                            }
+                            if (health > 1){
+                                health -= incHealth;
+                            }
+                        }
+                        break;
+                    case "dev":
+                        Brick brick = new Brick(100, 200, 1, 100, 30);
                         brickList.add(brick);
-                    }
+                        break;
+                    default:
+                        System.out.println("Error - No shape found for round!"); 
+                        break;  
                 }
             } else {
                 System.out.println("File does not exist: " + file.getAbsolutePath());
@@ -257,19 +306,6 @@ class MyPanel extends JPanel {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } 
-
-          
-        
-        // int health = 3;
-        // for (int row = 10; row <= 85; row += 35) {
-        //     for (int b = 5; b < 500; b += 99) {
-        //         Brick brick = new Brick(b, row, health);
-        //         brickList.add(brick);
-        //     }
-        //     if (health > 1){
-        //         health--;
-        //     }
-        // }
     }
 
     public void calcNewBallDirection() {
@@ -311,21 +347,18 @@ class MyPanel extends JPanel {
                     if (ball.x + ball.ballDiameter >= slider.getBounds().x &&
                             ball.x <= slider.getBounds().x + slider.getBounds().width &&
                             ball.y + ball.ballDiameter - 1 <= slider.getBounds().y) {
-                        System.out.println("Move up!");
                         calcNewBallDirection();
                     }
                     // Go Left
                     else if (ball.x <= slider.getBounds().x &&
                             ball.y > slider.getBounds().y - ball.ballDiameter &&
                             ball.y < slider.getBounds().y + slider.getBounds().height) {
-                        System.out.println("Go Left");
                         ball.speedX *= -1;
                     }
                     // Go Right
                     else if (ball.x >= slider.getBounds().x + slider.getBounds().width - 1 &&
                             ball.y > slider.getBounds().y - ball.ballDiameter &&
                             ball.y < slider.getBounds().y + slider.getBounds().height) {
-                        System.out.println("Go Right");
                         ball.speedX *= -1;
                     }
                 }
@@ -334,7 +367,6 @@ class MyPanel extends JPanel {
                 Brick hitBrick = ball.brickCollision();
                 if (hitBrick != null) {
                     increaseScore(100);
-                    System.out.println("Collision!");
                     int ballX = (int) ball.x;
                     int ballY = (int) ball.y;
                     int ballD = ball.ballDiameter;
@@ -347,7 +379,6 @@ class MyPanel extends JPanel {
                     if (ballX + ballD >= brickX && ballX <= brickX + brickW &&
                             ballY + ballD - 3 <= brickY) {
                         ball.speedY *= -1;
-                        System.out.println("Go up!");
                     }
 
                     // Go Down
@@ -355,7 +386,6 @@ class MyPanel extends JPanel {
                             ballX <= brickX + brickW &&
                             ballY >= brickY + brickH - 3) {
                         ball.speedY *= -1;
-                        System.out.println("Go down!");
                     }
 
                     // Go Left
@@ -363,7 +393,6 @@ class MyPanel extends JPanel {
                             ballY > brickY - ballD &&
                             ballY < brickY + brickH) {
                         ball.speedX *= -1;
-                        System.out.println("Go left!");
                     }
 
                     // Go Right
@@ -371,7 +400,6 @@ class MyPanel extends JPanel {
                             ballY > brickY - ballD &&
                             ballY < brickY + brickH) {
                         ball.speedX *= -1;
-                        System.out.println("Go right!");
                     }
 
                     // Reduce health of brick and remove from screen if no health
@@ -440,6 +468,10 @@ class MyPanel extends JPanel {
     public void endGame() {
         displayEndSign();
         this.setEnabled(false);
+    }
+    
+    public void winGame(){
+        displayVictorySign();
     }
 }
 
